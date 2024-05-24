@@ -1,17 +1,15 @@
 // import 'package:console/console.dart' as console;
 
+import 'package:h3/http-layer/H4.dart';
 import 'package:h3/http-layer/index.dart';
 
 void main(List<String> arguments) async {
-  // var connect = await initializeHttpConnection();
-  // await handleRequests(connect);
-  // print(dartIsFun());
+  var router = H4Router((event) => "Hi");
 
-  var router = H4Router((event) => event.path);
+  var app = createApp();
+  app.use(router);
 
-  router.get("/hallo", (event) => event.handled);
-
-  print(router.lookup("/hallo")["GET"]);
+  router.post("/", (event) => "HIII");
 }
 
 class Person {
