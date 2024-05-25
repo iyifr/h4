@@ -8,6 +8,7 @@ environment:
 
 # Add regular dependencies here.
 dependencies:
+  extension_type_unions: ^1.0.10
   http2: ^2.3.0
   meta: ^1.15.0
   # path: ^1.8.0

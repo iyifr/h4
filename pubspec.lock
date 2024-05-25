@@ -73,6 +73,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.3"
+  extension_type_unions:
+    dependency: "direct main"
+    description:
+      name: extension_type_unions
+      sha256: "1b2ac85028437f06087bf4bfd40fc20df7d704c3d611090ae17db855b42e9130"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.10"
   file:
     dependency: transitive
     description:
