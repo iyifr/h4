@@ -1,17 +1,19 @@
 // import 'package:console/console.dart' as console;
 
-import 'package:h3/http-layer/h4.dart';
-import 'package:h3/http-layer/index.dart';
+import 'package:h3/create.dart';
 
 void main(List<String> arguments) async {
-  var router = H4Router((event) => "Hi");
-
   var app = createApp();
+  var router = createRouter();
+
   app.use(router);
 
+  router.get("/", (event) => "Hello world");
   router.post("/", (event) => "HIII");
   router.get("/:id", (event) {
     print(event.params);
-    return "Hi ${event.params?["ïd"]}";
+    return "Hi ${event.params?["id"]}";
   });
+
+  router.get("/vamos/:studentId", (event) => "Response");
 }
