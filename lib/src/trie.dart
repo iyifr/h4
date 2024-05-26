@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:core';
-import 'package:h3/http-layer/event.dart';
+import 'package:h3/src/event.dart';
 
 typedef HandlerFunc = FutureOr<dynamic> Function(H4Event event);
 
@@ -96,7 +96,6 @@ class Trie {
       }
       currNode = currNode?.children[pathPiece];
     }
-    print(params);
     return params;
   }
 }

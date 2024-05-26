@@ -8,12 +8,6 @@ void main(List<String> arguments) async {
 
   app.use(router);
 
-  router.get("/", (event) => "Hello world");
+  router.get("/", (event) => null);
   router.post("/", (event) => "HIII");
-  router.get("/:id", (event) {
-    print(event.params);
-    return "Hi ${event.params?["id"]}";
-  });
-
-  router.get("/vamos/:studentId", (event) => "Response");
 }

@@ -14,7 +14,7 @@ class H4Event {
   String get method => _request.method.toUpperCase();
 
   set statusCode(int code) {
-    _request.response.statusCode = code;
+    _request.response.statusCode = HttpStatus.notFound;
   }
 
   set eventParams(Map<String, dynamic> params) {
@@ -41,10 +41,8 @@ class H4Event {
   }
 
   respond(dynamic handlerResult) {
-    if (!handled) {
-      _request.response.write(handlerResult);
-      _request.response.close();
-      handled = true;
-    }
+    _request.response.write(handlerResult);
+    _request.response.close();
+    handled = true;
   }
 }
