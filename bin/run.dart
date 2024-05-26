@@ -7,7 +7,5 @@ void main(List<String> arguments) async {
   var router = createRouter();
 
   app.use(router);
-
-  router.get("/", (event) => null);
-  router.post("/", (event) => "HIII");
+  router.get("users/:id/database", (event) => []);
 }
