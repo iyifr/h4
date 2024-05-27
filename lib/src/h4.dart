@@ -1,7 +1,6 @@
 import 'dart:io';
 import '/src/index.dart';
 import '/src/trie.dart';
-import '/src/event.dart';
 import '/utils/intialize_connection.dart';
 
 class H4 {
@@ -40,10 +39,14 @@ class H4 {
       }
 
       // Handle not found.
-      defineEventHandler((event) {
+      var notFound = defineEventHandler((event) {
         event.statusCode = 404;
         return {"message": "No handler matching route ${event.path}"};
-      }, params)(request);
+      }, params);
+
+      if (handler == null || match == null) {
+        notFound(request);
+      }
     });
   }
 }
