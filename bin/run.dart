@@ -8,6 +8,16 @@ void main(List<String> arguments) async {
 
   app.use(router);
 
-  router.get("/*", (event) => "welcome");
+  app.onRequest((event) {
+    print(event.path);
+  });
+
+  app.onError((e, s) {
+    print("UH OHHHHH $e");
+  });
+
+  router.get("/*", (event) {
+    throw Exception("Wahala");
+  });
   router.get("/25/**", (event) => "welcome hooooommeee");
 }
