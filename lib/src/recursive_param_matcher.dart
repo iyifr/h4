@@ -1,4 +1,4 @@
-import 'package:h3/src/trie.dart';
+import 'package:h4/src/trie.dart';
 
 class Stack<T> {
   final List<T> _items = [];

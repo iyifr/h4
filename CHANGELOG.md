@@ -1,3 +1,3 @@
 ## 0.0.1
 
-- Prototyping.
+- Prototyping to get the API right.
