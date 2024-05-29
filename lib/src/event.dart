@@ -14,12 +14,14 @@ class H4Event {
   String get method => _request.method.toUpperCase();
 
   set statusCode(int code) {
-    _request.response.statusCode = HttpStatus.notFound;
+    _request.response.statusCode = code;
   }
 
   set eventParams(Map<String, dynamic> params) {
     this.params = params;
   }
+
+  get statusMessage => _request.response.reasonPhrase;
 
   Map<String, HttpRequest> get node => {'value': _request};
 

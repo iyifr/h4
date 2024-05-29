@@ -1,8 +1,6 @@
 import 'dart:async';
 import 'dart:core';
-import 'dart:io';
 import 'package:h3/src/event.dart';
-import 'package:h3/src/h4.dart';
 import 'package:h3/src/recursive_param_matcher.dart';
 
 typedef HandlerFunc = FutureOr<dynamic> Function(H4Event event);
@@ -85,7 +83,8 @@ class Trie {
     for (String pathPiece in pathPieces) {
       if (currNode?.children[pathPiece] == null) {
         currNode?.children.forEach((key, value) {
-          if (key.startsWith(":") && value.handlers.isNotEmpty) {
+          if ((key.startsWith(":") || key.startsWith("*")) &&
+              value.handlers.isNotEmpty) {
             // Do not behave like a wildcard. Only match if the param route is an exact match.
             if (pathPieces.lastOrNull == pathPiece) {
               laHandler = value.handlers;
@@ -101,7 +100,6 @@ class Trie {
 
           if (key.startsWith(":") && !value.isLeaf) {
             var result = dynamicRecursive(value.children);
-            print(result["handlers"]);
 
             if (result["leaf"] == pathPieces.lastOrNull) {
               laHandler = result["handlers"];
@@ -124,10 +122,40 @@ class Trie {
           if (key.startsWith(":")) {
             params[key.replaceAll(":", "")] = pathPiece;
           }
+
+          if (key.startsWith("*")) {
+            params[key.replaceAll("*", "_")] = pathPiece;
+          }
+
+          if (key.startsWith("**")) {
+            params[key.replaceAll("**", "_")] = pathPiece;
+          }
         });
       }
       currNode = currNode?.children[pathPiece];
     }
     return params;
+  }
+
+  matchWildCardRoute(List<String> pathPieces) {
+    Map<String, HandlerFunc?>? laHandler;
+
+    if (pathPieces.isEmpty) {
+      return root.handlers;
+    }
+
+    TrieNode? currNode = root;
+
+    for (String pathPiece in pathPieces) {
+      if (currNode?.children[pathPiece] == null) {
+        currNode?.children.forEach((key, value) {
+          if (key.startsWith("**") && value.isLeaf) {
+            laHandler = value.handlers;
+          }
+        });
+      }
+      currNode = currNode?.children[pathPiece];
+    }
+    return laHandler;
   }
 }
