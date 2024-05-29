@@ -20,4 +20,9 @@ void main(List<String> arguments) async {
   });
 
   router.get("/25/**", (event) => throw Exception("WtF"));
+
+  router.post("/vamos", (event) async {
+    await Future.delayed(Duration(milliseconds: 200));
+    return "HELLLO MANYANA";
+  });
 }
