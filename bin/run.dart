@@ -1,6 +1,7 @@
 // import 'package:console/console.dart' as console;
 
 import 'package:h3/create.dart';
+import 'package:h3/utils/create_error.dart';
 
 void main(List<String> arguments) async {
   var app = createApp();
@@ -10,14 +11,13 @@ void main(List<String> arguments) async {
 
   app.onRequest((event) {
     print(event.path);
+    print(event.method);
+    print(event.statusMessage);
   });
 
   app.onError((e, s) {
-    print("UH OHHHHH $e");
+    print("$e");
   });
 
-  router.get("/*", (event) {
-    throw Exception("Wahala");
-  });
-  router.get("/25/**", (event) => "welcome hooooommeee");
+  router.get("/25/**", (event) => throw Exception("WtF"));
 }
