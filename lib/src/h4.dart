@@ -79,7 +79,7 @@ class H4 {
         }
       } on CreateError catch (e) {
         var handleKnownError = defineEventHandler((event) {
-          event.statusCode = 400;
+          event.statusCode = e.errorCode;
           return {"status": e.errorCode, "message": e.message};
         }, {});
         handleKnownError(request);

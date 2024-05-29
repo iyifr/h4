@@ -1,6 +1,7 @@
 // import 'package:console/console.dart' as console;
 
 import 'package:h4/create.dart';
+import 'package:h4/utils/create_error.dart';
 
 void main(List<String> arguments) {
   var app = createApp();
@@ -10,8 +11,6 @@ void main(List<String> arguments) {
 
   app.onRequest((event) {
     print(event.path);
-    print(event.method);
-    print(event.statusMessage);
   });
 
   app.onError((e, s) {
@@ -23,5 +22,9 @@ void main(List<String> arguments) {
   router.post("/vamos", (event) async {
     await Future.delayed(Duration(milliseconds: 200));
     return "HELLLO MANYANA";
+  });
+
+  router.get("/vamos", (event) {
+    throw CreateError('Lol nahhh');
   });
 }

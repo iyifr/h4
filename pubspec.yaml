@@ -1,6 +1,6 @@
 name: h4
 description: A minimal HTTP library for dart
-version: 0.0.1
+version: 1.0.0
 repository: https://github.com/iyifr/h4
 
 environment:

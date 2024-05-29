@@ -8,9 +8,9 @@ class CreateError implements HttpException {
   String _message = "An error occured";
   int _errorCode = 400;
 
-  CreateError(Map<String, dynamic> body) {
-    _message = body["message"];
-    _errorCode = body["status"];
+  CreateError(String message, [int? status]) {
+    _message = message;
+    _errorCode = status ?? 400;
   }
 
   @override
@@ -18,6 +18,11 @@ class CreateError implements HttpException {
 
   @override
   Uri? get uri => null;
+
+  @override
+  String toString() {
+    return '$_errorCode - $_message';
+  }
 
   int get errorCode => _errorCode;
 }
