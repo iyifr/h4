@@ -3,7 +3,7 @@
 import 'package:h4/create.dart';
 import 'package:h4/src/create_error.dart';
 
-void main(List<String> arguments) {
+void main(List<String> arguments) async {
   // var app = createApp();
   // var router = createRouter();
 
