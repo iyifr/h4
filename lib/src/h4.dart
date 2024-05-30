@@ -14,18 +14,24 @@ class H4 {
   H4Router? router;
   MiddleWareObject? config;
   Middleware _onRequestHandler;
+  int port = 3000;
   void Function(dynamic e, dynamic s) _onErrorHandler =
       (e, s) => print('$e /n $s');
 
-  H4() {
+  H4({int? port}) {
+    this.port = port ?? 3000;
     start();
   }
 
   start() async {
-    server = await initializeHttpConnection();
+    server = await initializeHttpConnection(port: port);
     if (server != null) {
       _bootstrap();
     }
+  }
+
+  close([bool force = true]) async {
+    await server?.close(force: force);
   }
 
   use(H4Router router) {

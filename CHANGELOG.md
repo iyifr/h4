@@ -16,4 +16,4 @@
 #### Added
 
 - onError and onRequest middleware.
-- Awaiting the result of asynchronous Event Handlers.
+- Asynchronous Event Handlers.

@@ -4,27 +4,27 @@ import 'package:h4/create.dart';
 import 'package:h4/src/create_error.dart';
 
 void main(List<String> arguments) {
-  var app = createApp();
-  var router = createRouter();
+  // var app = createApp();
+  // var router = createRouter();
 
-  app.use(router);
+  // app.use(router);
 
-  app.onRequest((event) {
-    print(event.path);
-  });
+  // app.onRequest((event) {
+  //   print(event.path);
+  // });
 
-  app.onError((e, s) {
-    print("$e");
-  });
+  // app.onError((e, s) {
+  //   print("$e");
+  // });
 
-  router.get("/25/**", (event) => throw Exception("WtF"));
+  // router.get("/25/**", (event) => throw Exception("WtF"));
 
-  router.post("/vamos", (event) async {
-    await Future.delayed(Duration(milliseconds: 200));
-    return "HELLLO MANYANA";
-  });
+  // router.post("/vamos", (event) async {
+  //   await Future.delayed(Duration(milliseconds: 200));
+  //   return "HELLLO MANYANA";
+  // });
 
-  router.get("/vamos", (event) {
-    throw CreateError('Lol nahhh');
-  });
+  // router.get("/vamos", (event) {
+  //   throw CreateError('Lol nahhh');
+  // });
 }

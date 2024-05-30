@@ -6,6 +6,11 @@ repository: https://github.com/iyifr/h4
 environment:
   sdk: ^3.3.0
 
+topics: 
+  - http
+  - server
+  - api
+
 # Add regular dependencies here.
 dependencies:
   extension_type_unions: ^1.0.10
@@ -16,3 +21,4 @@ dependencies:
 dev_dependencies:
   lints: ^3.0.0
   test: ^1.24.0
+  dio: ^5.4.3+1
