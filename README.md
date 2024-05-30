@@ -52,6 +52,7 @@ Yes it's that easy!
 ## Examples
 
 ### Routing with Params
+You can define parameters in your routes using : prefix:
 
 ```dart
 router.get('/users/:id', (event) {
@@ -66,13 +67,13 @@ H4 provides two middleware functions. Do not return anything from middleware as 
 the request.
 
 ```dart
- app.onRequest((event) {
-  print('Incoming request method: ${event.method}');
- });
+app.onRequest((event) {
+ print('Incoming request method: ${event.method}');
+});
 
- app.onError((error) {
-    print("$error");
-  });
+app.onError((error) {
+ print("$error");
+});
 ```
 
 ### Error Handling
@@ -82,7 +83,7 @@ response to the client with a json payload.
 
 ```dart
 router.get('/error', (event) {
-  throw CreateError('Something went wrong');
+ throw CreateError('Something went wrong');
 });
 ```
 
@@ -100,7 +101,6 @@ router.get('/error', (event) {
 router.get('/articles/*', (event) {
  final path = event.path;
  return 'The tea is teaing!!'
-
 });
 ```
 
@@ -109,7 +109,6 @@ router.get('/articles/*', (event) {
 router.get('/articles/**', (event) {
  final path = event.path;
  return 'The tea is teaing!!'
-
 });
 ```
 

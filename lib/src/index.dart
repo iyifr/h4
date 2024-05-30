@@ -63,6 +63,18 @@ class H4Router {
     routes.insert(extractPieces(path), handler, "POST");
   }
 
+  put(String path, HandlerFunc handler) {
+    routes.insert(extractPieces(path), handler, "PUT");
+  }
+
+  patch(String path, HandlerFunc handler) {
+    routes.insert(extractPieces(path), handler, "PATCH");
+  }
+
+  delete(String path, HandlerFunc handler) {
+    routes.insert(extractPieces(path), handler, "DELETE");
+  }
+
   Map<String, HandlerFunc?>? lookup(path) {
     var result = routes.search(extractPieces(path));
 

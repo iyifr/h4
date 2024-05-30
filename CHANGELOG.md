@@ -18,7 +18,7 @@
 - onError and onRequest middleware.
 - Asynchronous Event Handlers.
 
-## [1.1.0] - 2024-05-30
+## [1.1.0]
 
 - Minor Release
 
@@ -30,3 +30,8 @@
 ```dart
 var app = createApp(port: 5000)
 ```
+
+## [1.1.1]
+#### Patch Release
+
+- Added put and delete methods to createRouter()
