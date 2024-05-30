@@ -30,7 +30,7 @@ class H4 {
     }
   }
 
-  close([bool force = true]) async {
+  close({bool force = true}) async {
     await server?.close(force: force);
   }
 

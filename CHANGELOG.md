@@ -17,3 +17,16 @@
 
 - onError and onRequest middleware.
 - Asynchronous Event Handlers.
+
+## [1.1.0] - 2024-05-30
+
+- Minor Release
+
+#### Added
+
+- You can now initialize the server with another port apart from 3000 by passing a port value to the
+  named port parameter in createApp()
+
+```dart
+var app = createApp(port: 5000)
+```
