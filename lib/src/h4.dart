@@ -1,9 +1,9 @@
 import 'dart:io';
-import 'package:h4/utils/create_error.dart';
+import 'package:h4/src/create_error.dart';
 
 import '/src/index.dart';
 import '/src/trie.dart';
-import '/utils/intialize_connection.dart';
+import 'intialize_connection.dart';
 import 'event.dart';
 
 typedef Middleware = void Function(H4Event event)?;

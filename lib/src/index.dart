@@ -4,7 +4,7 @@ import 'dart:io';
 import 'dart:convert';
 
 import 'package:h4/src/trie.dart';
-import 'package:h4/utils/extract_path_pieces.dart';
+import 'package:h4/src/extract_path_pieces.dart';
 import 'package:h4/src/event.dart';
 
 // Inversion of control, letting the caller define the event. For stuff like reading params.
