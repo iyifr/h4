@@ -73,13 +73,6 @@ class Trie {
 
     TrieNode? currNode = root;
 
-    // for (String pathPiece in pathPieces) {
-    //   if (currNode?.children[pathPiece] != null) {
-    //     print('$pathPiece - ${currNode?.children[pathPiece]}');
-    //   }
-    //   currNode = currNode?.children[pathPiece];
-    // }
-
     for (String pathPiece in pathPieces) {
       if (currNode?.children[pathPiece] == null) {
         currNode?.children.forEach((key, value) {
@@ -107,7 +100,6 @@ class Trie {
           }
         });
       }
-
       currNode = currNode?.children[pathPiece];
     }
     return laHandler;

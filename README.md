@@ -1,8 +1,10 @@
 # H4.
 
-> H4 is a **lightweight**, **modular**, and **blazing fast** Dart HTTP library that makes building
-> API's too easy. With its composable utils and functional design, you'll write less boilerplate and
-> more functionality.
+![og](https://assets.uploadfast.dev/banner2.png)
+
+> H4 is a **lightweight**, **modular**, and **blazing fast** Dart HTTP library for productive and
+> fun API development. With its composable utils and functional design, you'll write less
+> boilerplate and more functionality.
 
 ## Features
 
@@ -45,6 +47,8 @@ void main() {
 }
 ```
 
+Yes it's that easy!
+
 ## Examples
 
 ### Routing with Params
@@ -58,29 +62,23 @@ router.get('/users/:id', (event) {
 
 ### Middleware
 
-Do not return anything from middleware.
+H4 provides two middleware functions. Do not return anything from middleware as this will terminate
+the request.
 
 ```dart
  app.onRequest((event) {
   print('Incoming request method: ${event.method}');
  });
 
-  app.onError((e, s) {
-    print("$e");
+ app.onError((error) {
+    print("$error");
   });
 ```
 
 ### Error Handling
 
 You can throw a create error Exception that will terminate the request and send a 400 - Bad Request
-response to the client with this json payload
-
-```json
-{
-	"status": 400,
-	"message": "${your error message here}"
-}
-```
+response to the client with a json payload.
 
 ```dart
 router.get('/error', (event) {
@@ -88,12 +86,30 @@ router.get('/error', (event) {
 });
 ```
 
+```json
+{
+ "status": 400,
+ "message": "An error ocurred"
+}
+```
+
 ### Wildcard Routing
 
 ```dart
+// Matches 'articles/page' and '/articles/otherPage' but not 'articles/page/otherPage'
 router.get('/articles/*', (event) {
-  final path = event.path;
-  return 'The tea is teaing!!'
+ final path = event.path;
+ return 'The tea is teaing!!'
+
+});
+```
+
+```dart
+// Matches 'articles/foo/bar' and 'articles/rice/eba/beans'
+router.get('/articles/**', (event) {
+ final path = event.path;
+ return 'The tea is teaing!!'
+
 });
 ```
 

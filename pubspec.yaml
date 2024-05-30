@@ -1,12 +1,14 @@
 name: h4
-description: A minimal HTTP library for dart
-version: 1.0.0
+description:
+  A minimal HTTP library for building elegant, composable server applications. Lightweight core with
+  utilities for adding functionalities to your server. You can even create your own!
+version: 1.1.0
 repository: https://github.com/iyifr/h4
 
 environment:
   sdk: ^3.3.0
 
-topics: 
+topics:
   - http
   - server
   - api
