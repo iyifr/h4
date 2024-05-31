@@ -41,4 +41,14 @@ Apologies for any distruptions, we are now prioritizing mature and stable develo
 
   - Removed unecessary logs.
 
-  - Used logger library when necessary.
+  - Used logger library when necessary to log.
+
+- #### Improved
+
+  - CreateError Utility : It now uses named parameters for message and errorCode.
+
+  ```dart
+   router.get("/vamos", (event) {
+   throw CreateError(message: 'Error occured', errorCode: 400);
+  });
+  ```

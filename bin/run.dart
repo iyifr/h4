@@ -26,6 +26,6 @@ void main(List<String> arguments) async {
   });
 
   router.get("/vamos", (event) {
-    throw CreateError(message: 'Error occured', errorCode: 400);
+    throw CreateError(message: 'Error occured', errorCode: 404);
   });
 }
