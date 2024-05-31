@@ -32,6 +32,7 @@ var app = createApp(port: 5000)
 ```
 
 ## [1.1.1]
+
 #### Patch Release
 
-- Added put and delete methods to createRouter()
+- Added put, patch and delete methods to createRouter()

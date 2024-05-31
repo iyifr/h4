@@ -1,9 +1,9 @@
 # H4.
 
-![og](https://assets.uploadfast.dev/banner2.png)
+![og](https://assets.uploadfast.dev/h4-dev.png)
 
-> H4 is a **lightweight**, **modular**, and **blazing fast** Dart HTTP library for productive and
-> fun API development. With its composable utils and functional design, you'll write less
+> H4 is a **lightweight**, **minimal**, and **blazing fast** HTTP framework for productive and fun
+> API development with dart. With its composable utils and functional design, you'll write less
 > boilerplate and more functionality.
 
 ## Features
@@ -52,6 +52,7 @@ Yes it's that easy!
 ## Examples
 
 ### Routing with Params
+
 You can define parameters in your routes using : prefix:
 
 ```dart
@@ -89,8 +90,8 @@ router.get('/error', (event) {
 
 ```json
 {
- "status": 400,
- "message": "An error ocurred"
+	"status": 400,
+	"message": "An error ocurred"
 }
 ```
 
