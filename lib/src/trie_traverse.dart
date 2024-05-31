@@ -1,6 +1,6 @@
 import 'package:h4/src/trie.dart';
 
-class Stack<T> {
+class TrieNodeStack<T> {
   final List<T> _items = [];
 
   void push(T item) {
@@ -9,7 +9,7 @@ class Stack<T> {
 
   T pop() {
     if (_items.isEmpty) {
-      throw StateError('Stack is empty');
+      // throw StateError('Stack is empty');
     }
     return _items.removeLast();
   }
@@ -23,8 +23,8 @@ class Stack<T> {
     _items.addAll(items.toList().reversed);
   }
 
-  static Stack<T> from<T>(Iterable<T> iterable) {
-    final stack = Stack<T>();
+  static TrieNodeStack<T> from<T>(Iterable<T> iterable) {
+    final stack = TrieNodeStack<T>();
     for (final item in iterable) {
       stack.push(item);
     }
@@ -32,8 +32,9 @@ class Stack<T> {
   }
 }
 
-Map<String, dynamic> dynamicRecursive(Map<String, TrieNode> nodes) {
-  Stack<MapEntry<String, TrieNode>> stack = Stack.from(nodes.entries);
+Map<String, dynamic> deepTraverse(Map<String, TrieNode> nodes) {
+  TrieNodeStack<MapEntry<String, TrieNode>> stack =
+      TrieNodeStack.from(nodes.entries);
   Map<String, dynamic> result = {'handlers': null, 'leaf': null};
 
   while (stack.isNotEmpty) {

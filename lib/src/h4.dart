@@ -1,8 +1,8 @@
 import 'dart:io';
 import 'package:h4/src/create_error.dart';
+import 'package:h4/src/logger.dart';
 
 import '/src/index.dart';
-import '/src/trie.dart';
 import 'intialize_connection.dart';
 import 'event.dart';
 
@@ -23,37 +23,38 @@ class H4 {
     start();
   }
 
+  /// Initializes the server on **localhost** and starts listening for requests.
   start() async {
     server = await initializeHttpConnection(port: port);
-    if (server != null) {
-      _bootstrap();
-    }
+    _bootstrap();
   }
 
+  /// Shuts down the server and stops listening to requests.
   close({bool force = true}) async {
     await server?.close(force: force);
   }
 
-  use(H4Router router) {
+  /// Add a H4Router that handles request to the server.
+  void use(H4Router router) {
     this.router = router;
   }
 
-  onRequest(Middleware func) {
+  void onRequest(Middleware func) {
     _onRequestHandler = func;
   }
 
-  onError(void Function(dynamic e, dynamic s) error) {
+  void onError(void Function(dynamic e, dynamic s) error) {
     _onErrorHandler = error;
   }
 
   _bootstrap() {
     server?.listen((HttpRequest request) {
       try {
-        HandlerFunc? handler;
+        EventHandler? handler;
 
         if (router == null) {
-          print(
-              "No router is defined, did you forget to add a router to your app ?");
+          logger.w(
+              "No router is defined, it is advised to use createRouter() to listen for incoming requests.");
         }
 
         // Find handler for that request

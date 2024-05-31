@@ -2,37 +2,43 @@
 
 - Initial development release.
 
-## [1.0.0]
+### Retraction Notice
 
-- Initial Stable Release
+Previous releases and versions 1.0.0, 1.0.1 and 1.1.0 were retracted due to immature development on
+the author's part.
 
-#### Breaking Changes
+Apologies for any distruptions, we are now prioritizing mature and stable development over speed.
 
-- The createError exception in the http library now expects the error message as a String and the
-  error code as an int, instead of a Map<String, dynamic> containing these two values. The signature
-  has changed from createError(Map<String, dynamic> errorData) to createError(String message, int?
-  errorCode). Where error code defaults to 400.
+## 0.0.2
 
-#### Added
+- #### New
 
-- onError and onRequest middleware.
-- Asynchronous Event Handlers.
+  - requestBody utility: The first H4 utility function (readBody) is underway but not ready for
+    production use.
 
-## [1.1.0]
+    - Improved implementation of parseRequestBody correctly parses request body in non-binary,
+      non-file formats as a string and returns the value.
 
-- Minor Release
+  - Documentation for **H4 router**
 
-#### Added
+  - Documentation and type definitions **event handler**
 
-- You can now initialize the server with another port apart from 3000 by passing a port value to the
-  named port parameter in createApp()
+    - Renamed **HandlerFunc** type definition to **EventHandler**
+    - Added documentation for **Event Handler** functions.
 
-```dart
-var app = createApp(port: 5000)
-```
+  - Made router[requestMethod] instances generic for increased type safety.
 
-## [1.1.1]
+    ```dart
+      // This gives an error.
+      router.get<String>("/25/**", (event) => true);
 
-#### Patch Release
+      // This is valid
+      router.get<bool>("/25/**", (event) => true);
+    ```
 
-- Added put, patch and delete methods to createRouter()
+  - Improved predictability of event handler responses: You can now return more types of values from
+    event handlers.
+
+  - Removed unecessary logs.
+
+  - Used logger library when necessary.

@@ -1,16 +1,14 @@
-import 'dart:async';
 import 'dart:core';
 import 'package:h4/src/event.dart';
-import 'package:h4/src/recursive_param_matcher.dart';
-
-typedef HandlerFunc = FutureOr<dynamic> Function(H4Event event);
+import 'package:h4/src/index.dart';
+import 'package:h4/src/trie_traverse.dart';
 
 class TrieNode {
   Map<String, TrieNode> children;
   bool isLeaf;
-  Map<String, HandlerFunc?> handlers;
+  Map<String, EventHandler?> handlers;
 
-  TrieNode([HandlerFunc? handler, String method = "GET"])
+  TrieNode([EventHandler? handler, String method = "GET"])
       : children = {},
         isLeaf = false,
         handlers = {method: handler};
@@ -65,7 +63,7 @@ class Trie {
   }
 
   matchParamRoute(List<String> pathPieces) {
-    Map<String, HandlerFunc?>? laHandler;
+    Map<String, EventHandler?>? laHandler;
 
     if (pathPieces.isEmpty) {
       return root.handlers;
@@ -83,7 +81,7 @@ class Trie {
               laHandler = value.handlers;
             } else {
               // Handle weird edge case where a handler with id as a leaf is defined in route trie
-              var result = dynamicRecursive(value.children);
+              var result = deepTraverse(value.children);
 
               if (result["leaf"] == pathPieces.lastOrNull) {
                 laHandler = result["handlers"];
@@ -92,7 +90,7 @@ class Trie {
           }
 
           if (key.startsWith(":") && !value.isLeaf) {
-            var result = dynamicRecursive(value.children);
+            var result = deepTraverse(value.children);
 
             if (result["leaf"] == pathPieces.lastOrNull) {
               laHandler = result["handlers"];
@@ -130,7 +128,7 @@ class Trie {
   }
 
   matchWildCardRoute(List<String> pathPieces) {
-    Map<String, HandlerFunc?>? laHandler;
+    Map<String, EventHandler?>? laHandler;
 
     if (pathPieces.isEmpty) {
       return root.handlers;

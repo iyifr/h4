@@ -1,30 +1,30 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:h4/src/event.dart';
+Future<String> parseRequestBody(HttpRequest request,
+    {Duration timeout = const Duration(seconds: 60)}) async {
+  // if (request.headers.contentType?.mimeType != 'application/json') {
+  //   throw FormatException(
+  //       'Unsupported content type: ${request.headers.contentType}');
+  // }
 
-Future<dynamic> readBody(HttpRequest request) async {
-  var rawBody = await request.toList();
+  try {
+    var bodyBytes = await request.fold<List<int>>(
+      <int>[],
+      (previousValue, element) => previousValue..addAll(element),
+    ).timeout(timeout);
 
-  if (rawBody.isNotEmpty) {
-    var string = '';
-
-    for (int i = 0; i < rawBody.length; i++) {
-      string += utf8.decode(rawBody[i]); // Outputs each character of the string
+    if (bodyBytes.isEmpty) {
+      return '';
     }
-    return string;
+
+    return utf8.decode(bodyBytes);
+  } catch (e) {
+    if (e is TimeoutException) {
+      throw TimeoutException('Request body parsing timed out after $timeout');
+    } else {
+      throw FormatException('Error decoding request body: $e');
+    }
   }
-
-  return null;
-}
-
-Future<dynamic> readEventBody(H4Event event) async {
-  var request = event.node["value"];
-
-  if (request == null) {
-    return;
-  }
-
-  final eventBody = await readBody(request);
-  return eventBody;
 }
