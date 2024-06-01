@@ -52,3 +52,7 @@ Apologies for any distruptions, we are now prioritizing mature and stable develo
    throw CreateError(message: 'Error occured', errorCode: 400);
   });
   ```
+
+### 0.0.3
+
+- #### New

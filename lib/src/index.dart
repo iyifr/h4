@@ -35,16 +35,19 @@ defineEventHandler(EventHandler<dynamic> handler, Map<String, String> params,
     if (handlerResult == null) {
       event.setResponseFormat("null");
       event.respond(handlerResult);
+      return;
     }
 
     if (handlerResult is String) {
       event.setResponseFormat("html");
       event.respond(handlerResult);
+      return;
     }
 
     if (handlerResult is DateTime) {
       event.setResponseFormat("text");
       event.respond(handlerResult.toIso8601String());
+      return;
     }
 
     if (handlerResult is Map || handlerResult is List || handlerResult is Set) {
@@ -52,6 +55,7 @@ defineEventHandler(EventHandler<dynamic> handler, Map<String, String> params,
       // Encode to jsonString and return
       handlerResult = jsonEncode(handlerResult);
       event.respond(handlerResult);
+      return;
     }
 
     if (handlerResult is Future) {
@@ -62,6 +66,7 @@ defineEventHandler(EventHandler<dynamic> handler, Map<String, String> params,
         request.response.write("Internal server error");
         request.response.close();
       });
+      return;
     }
 
     /// If the [EventHandler] returns a value of type Bool, RegExp, Uri, Symbol or Num set the response format to 'text/plain'
@@ -69,6 +74,7 @@ defineEventHandler(EventHandler<dynamic> handler, Map<String, String> params,
     /// Serialize the value and send it as a response.
     event.setResponseFormat("text");
     event.respond(handlerResult.toString());
+    return;
   };
 }
 

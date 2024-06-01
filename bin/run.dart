@@ -22,11 +22,11 @@ void main(List<String> arguments) async {
   router.get("/", (event) => throw ("HSHAHAHAH"));
 
   router.post("/vamos", (event) async {
-    await Future.delayed(Duration(milliseconds: 200));
+    await Future.delayed(Duration(milliseconds: 100));
     return "HELLLO MANYANA";
   });
 
   router.get("/vamos", (event) {
-    throw CreateError(message: 'Error occured', errorCode: 404);
+    throw CreateError(message: 'A grave error happened', errorCode: 404);
   });
 }

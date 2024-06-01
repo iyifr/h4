@@ -6,17 +6,17 @@ import 'dart:io';
 /// The `H4Event` class encapsulates an HTTP request and provides methods and properties
 /// to interact with the request and generate the appropriate response.
 class H4Event {
-  Map<String, String> params;
+  Map<String, String> _params;
 
   /// The HTTP request that triggered the event.
   ///
   /// This field is non-nullable and must be provided when creating an `H4Event` instance.
   final HttpRequest _request;
 
-  /// Indicates whether the event has been handled and a response has been generated.
+  /// Tells us whether the event has been handled and a response has been generated.
   bool handled = false;
 
-  H4Event(this._request) : params = {};
+  H4Event(this._request) : _params = {};
 
   String get path => _request.uri.path;
 
@@ -29,7 +29,7 @@ class H4Event {
 
   /// Sets the event parameters to the provided [params] map.
   set eventParams(Map<String, String> params) {
-    this.params = params;
+    _params = params;
   }
 
   /// The status message associated with the HTTP response status code.
