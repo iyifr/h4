@@ -5,8 +5,7 @@
 > H4 is a **lightweight**, **minimal**, and **blazing fast** HTTP framework for productive and fun
 > API development with dart.
 
-**H4 is a very new framework under very active development. It's not advised to for production
-use.**
+**H4 is a new framework under active development. It's not yet ready for production use.**
 
 ## Features
 
@@ -84,7 +83,9 @@ router.get('/error', (event) {
  throw CreateError(message: 'Something went wrong', errorCode: 400);
 });
 ```
-The client recieves this json payload - 
+
+The client recieves this json payload -
+
 ```json
 {
  "status": 400,
@@ -114,12 +115,12 @@ router.get('/articles/**', (event) {
 
 We are looking for contributors!
 
-There's still quite a bit of work to do on to get H4 to 1.0.
+There's still quite a bit of work to do to get H4 to 1.0.0 and ready for production use.
 
 If you find a bug or have an idea for a new feature, please
 [open an issue](https://github.com/iyifr/h4/issues/new) or submit a pull request.
 
 ## Code of Conduct.
-Everyone is welcome here! Good vibes are of paramount importance. Please be kind and respectful when
-opening an issue or suggesting ideas. This makes the author feel good and everyone else feel good
-vibes. It's never that serious.
+
+Everyone is welcome here! Good vibes only. Show respect and consideration for others when creating
+issues and contributing to the library.

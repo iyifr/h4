@@ -56,3 +56,18 @@ Apologies for any distruptions, we are now prioritizing mature and stable develo
 ### 0.0.3
 
 - #### New
+
+  - Breaking Changes to **onError** middleware.
+
+    - The function passed to onError Middleware now has access to the error object (in string form),
+      the stacktrace of the error (also in string form) and the event that triggered the error.
+
+      ```dart
+      h4.onError((String error, String stackTrace, H4Event event) {
+        // Log the error to a service like sentry.
+        logErrorToService(error, stackTrace, event.path);
+      });
+      ```
+
+    - Documentation comments for public and internal API's including the H4 Class,
+      defineEventHandler, H4Event and H4Router.

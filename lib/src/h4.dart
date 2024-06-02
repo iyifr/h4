@@ -127,7 +127,7 @@ class H4 {
 
         if (router == null) {
           logger.w(
-              "No router is defined, it is advised to use createRouter() to listen for incoming requests.");
+              "No router is defined, it is recommended to use createRouter() to define a router.");
         }
 
         // Find handler for that request
