@@ -15,14 +15,17 @@ import 'package:h4/src/event.dart';
 /// It returns a function that is called with a HTTP request, it's job is to write a response and close the request.
 ///
 /// It should always close the request with the appropriate status code and message.
-defineEventHandler(EventHandler<dynamic> handler, Map<String, String> params,
-    [void Function(H4Event)? onRequest]) {
+Function(HttpRequest) defineEventHandler(
+  EventHandler<dynamic> handler, {
+  void Function(H4Event)? onRequest,
+  Map<String, String>? params,
+}) {
   return (HttpRequest request) {
     // Create an event with the incoming request.
     var event = H4Event(request);
 
     /// Sets the event params so it accessible in the handler.
-    event.eventParams = params;
+    event.eventParams = params ?? {};
 
     // If onRequest is defined, call it with the event.
     if (onRequest != null) {
@@ -61,10 +64,15 @@ defineEventHandler(EventHandler<dynamic> handler, Map<String, String> params,
     if (handlerResult is Future) {
       handlerResult
           .then((value) => event.respond(value))
-          .onError((error, stackTrace) {
-        request.response.statusCode = 500;
-        request.response.write("Internal server error");
-        request.response.close();
+          .onError((error, stack) {
+        // event.setResponseFormat("json");
+        // event.statusCode = 500;
+        // var response = {
+        //   "message": error.toString(),
+        //   "statusCode": 500,
+        //   "statusMessage": "Internal Server Error"
+        // };
+        // event.respond(jsonEncode(response));
       });
       return;
     }

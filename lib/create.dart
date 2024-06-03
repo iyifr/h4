@@ -8,8 +8,9 @@ import 'package:h4/src/index.dart';
 /// number. If no port is provided, the application will default to using port
 /// 3000.
 ///
-/// After creating the `H4` instance, the `start()` method is automatically
-/// called to begin running the application.
+/// After creating the `H4` instance, the `start` method is called to begin running the application and listening to requests
+///
+/// To opt out of this behaviour set `autoStart` property to `false`
 ///
 /// Example usage:
 /// ```dart
@@ -18,9 +19,13 @@ import 'package:h4/src/index.dart';
 ///
 /// // Start the application on the default port (3000)
 /// final app = createApp();
+///
+/// // Start the application manually
+/// final app = createApp(autoStart: false)
+/// await app.start().then((h4) => print('App started on ${h4.port}'))
 /// ```
-H4 createApp({int? port}) {
-  return H4(port: port);
+H4 createApp({int? port, bool autoStart = true}) {
+  return H4(port: port, autoStart: autoStart);
 }
 
 /// Create a router instance for mapping requests.

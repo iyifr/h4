@@ -7,6 +7,7 @@ import 'dart:io';
 /// to interact with the request and generate the appropriate response.
 class H4Event {
   Map<String, String> params;
+  Map<String, dynamic> context;
 
   /// The HTTP request that triggered the event.
   ///
@@ -14,9 +15,11 @@ class H4Event {
   final HttpRequest _request;
 
   /// Tells us whether the event has been handled and a response has been generated.
-  bool handled = false;
+  bool _handled = false;
 
-  H4Event(this._request) : params = {};
+  H4Event(this._request)
+      : params = {},
+        context = {};
 
   String get path => _request.uri.path;
 
@@ -83,10 +86,18 @@ class H4Event {
   /// If the [handlerResult] is `null`, the response will be closed without writing any content.
   /// The [handled] flag is set to `true` after the response is sent.
   void respond(dynamic handlerResult) {
-    if (handlerResult != null) {
-      _request.response.write(handlerResult);
+    if (_handled) {
+      return;
     }
-    _request.response.close();
-    handled = true;
+
+    if (handlerResult == null) {
+      _request.response.close();
+      _handled = true;
+    } else {
+      // Write the handler result to the response and close.
+      _request.response.write(handlerResult);
+      _request.response.close();
+      _handled = true;
+    }
   }
 }

@@ -1,16 +1,16 @@
 import 'dart:io';
 import 'package:h4/src/create_error.dart';
+import 'package:h4/src/error_middleware.dart';
 import 'package:h4/src/logger.dart';
 
 import '/src/index.dart';
-import 'intialize_connection.dart';
+import 'initialize_connection.dart';
 import 'event.dart';
 
 /// A middleware function that takes an [H4Event] and has access to it's snapshot.
 typedef Middleware = void Function(H4Event event)?;
 
-typedef ErrorHandler = void Function(
-    {required Object error, required StackTrace stackTrace});
+typedef ErrorHandler = void Function(String, String?, H4Event?);
 
 class H4 {
   HttpServer? server;
@@ -29,8 +29,11 @@ class H4 {
   /// number. If no port is provided, the application will default to using port
   /// 3000.
   ///
+  ///
   /// After creating the `H4` instance, the `start()` method is automatically
   /// called to begin running the application.
+  ///
+  /// To opt out of this behaviour set `autoStart` property to `false`
   ///
   /// Example usage:
   /// ```dart
@@ -40,15 +43,23 @@ class H4 {
   /// // Start the application on the default port (3000)
   /// final app = H4();
   /// ```
-  H4({int? port}) {
+  H4({int? port, bool autoStart = true}) {
     this.port = port ?? 3000;
-    start();
+    autoStart ? start() : null;
   }
 
   /// Initializes the server on **localhost** and starts listening for requests.
-  start() async {
-    server = await initializeHttpConnection(port: port);
-    _bootstrap();
+  Future<H4?> start() async {
+    try {
+      server = await initializeHttpConnection(
+        port: port,
+      );
+      _bootstrap();
+    } catch (e) {
+      logger.e(e.toString());
+      return null;
+    }
+    return this;
   }
 
   /// Shuts down the server and stops listening to requests.
@@ -122,27 +133,28 @@ class H4 {
 
   _bootstrap() {
     server?.listen((HttpRequest request) {
+      if (router == null) {
+        logger.w(
+            "No router is defined, it is recommended to use createRouter() to define a router.");
+      }
+
+      // Find handler for that request
+      var match = router?.lookup(request.uri.path);
+
+      var params = router?.getParams(request.uri.path);
+      params ??= {};
+
+      // Handling starts here.
       try {
         EventHandler? handler;
-
-        if (router == null) {
-          logger.w(
-              "No router is defined, it is recommended to use createRouter() to define a router.");
-        }
-
-        // Find handler for that request
-        var match = router?.lookup(request.uri.path);
-
-        var params = router?.getParams(request.uri.path);
-        params ??= {};
 
         if (match != null) {
           handler = match[request.method];
         }
 
+        // If we find no match for the request signature handle it accordingly
         if (handler == null || match == null) {
-          // Handle not found.
-          var notFound = defineEventHandler((event) {
+          defineEventHandler((event) {
             event.statusCode = 404;
             return {
               "status": 404,
@@ -150,78 +162,30 @@ class H4 {
               "message":
                   "No handler found for ${event.method.toUpperCase()} request to path - ${event.path}"
             };
-          }, params, _onRequestHandler);
-          notFound(request);
+          }, onRequest: _onRequestHandler, params: params)(request);
           return;
-        } else {
-          defineEventHandler(handler, params, _onRequestHandler)(request);
         }
-      } on CreateError catch (e) {
-        defineEventHandler((event) {
-          event.statusCode = e.errorCode;
-          return {"status": e.errorCode, "message": e.message};
-        }, {})(request);
-      } catch (e, stack) {
-        // Handle error middleware.
-        H4ErrorHandler(
-                handler: _errorHandler,
-                trace: stack,
-                error: e,
-                event: H4Event(request))
-            .handle();
+        // We've found a match - handle the request.
+        else {
+          defineEventHandler(handler,
+              onRequest: _onRequestHandler, params: params)(request);
+          return;
+        }
+      }
 
-        var handleUnKnownError = defineEventHandler((event) {
-          event.statusCode = 500;
-          return {"status": 500, "message": e.toString()};
-        }, {});
-        handleUnKnownError(request);
+      /// Handles a specific type of error, `CreateError` when it is thrown explicitly in a catch block
+      ///
+      /// It returns a function that is invoked with the incoming request which sends a JSON payload to the client with the error details.
+      on CreateError catch (e, trace) {
+        defineErrorHandler(_errorHandler,
+            params: params, error: e.message, trace: trace)(request);
+      }
+
+      /// Catch non-explicity error when they occur and send a JSON payload to the client.
+      catch (e, trace) {
+        defineErrorHandler(_errorHandler,
+            params: params, error: e.toString(), trace: trace)(request);
       }
     });
-  }
-}
-
-/// Handles errors that occur in the context of an [H4Event].
-///
-/// This class provides a centralized way to manage and handle errors that occur
-/// during the execution of an [H4Event]. It encapsulates the error information,
-/// including the error object, stack trace, and the event that triggered the
-/// error. The class also allows for the registration of an error handling
-/// function that can be executed when an error occurs.
-class H4ErrorHandler {
-  /// The error object that was thrown.
-  final Object error;
-
-  /// The stack trace associated with the error.
-  final StackTrace trace;
-
-  /// The function that should be executed to handle the error.
-  ///
-  /// This function will be called with the following parameters:
-  /// - `String` representation of the error message
-  /// - `String` representation of the stack trace
-  /// - The [H4Event] that triggered the error
-  final void Function(String, String?, H4Event)? handler;
-
-  /// The [H4Event] that triggered the error.
-  final H4Event event;
-
-  /// Constructs a new [H4ErrorHandler] instance.
-  ///
-  /// The [error], [trace], [handler], and [event] parameters are required.
-  H4ErrorHandler({
-    required this.error,
-    required this.trace,
-    required this.handler,
-    required this.event,
-  });
-
-  /// Executes the registered error handling function.
-  ///
-  /// If a [handler] function was provided, it will be called with the error
-  /// message, stack trace, and the [H4Event] that triggered the error.
-  void handle() {
-    if (handler != null) {
-      handler!(error.toString(), trace.toString(), event);
-    }
   }
 }

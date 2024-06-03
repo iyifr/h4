@@ -53,7 +53,7 @@ Apologies for any distruptions, we are now prioritizing mature and stable develo
   });
   ```
 
-### 0.0.3
+## 0.0.3
 
 - #### New
 
@@ -71,3 +71,36 @@ Apologies for any distruptions, we are now prioritizing mature and stable develo
 
     - Documentation comments for public and internal API's including the H4 Class,
       defineEventHandler, H4Event and H4Router.
+
+## 0.0.4
+
+- #### New
+
+  - Improved error handling for asynchronous event handlers - Throwing an error in an async handler
+    won't kill the process. It sends a JSON payload instead.
+
+    ```json
+    {
+    	"message": "Error message",
+    	"statusMessage": "Internal server error",
+    	"statusCode": 500
+    }
+    ```
+
+    TODO - onError handler does not run when errors are thrown async event handlers. (Fix in next
+    minor patc)
+
+  - Support for extended server configuration : You can now specify if you want to start
+    automatically or not. In the future you will be able to pass your own customer server and listen
+    to requests with H4.
+
+    ```dart
+      void main() async {
+        var app = createApp(port: 4000, autoStart: false);
+        await app.start().then((h4) => print('App is running on ${h4?.port}'));
+        var router = createRouter();
+        app.use(router)
+      };
+    ```
+
+    In the next patch release more server configuration objects will be added.
