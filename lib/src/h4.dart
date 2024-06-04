@@ -18,7 +18,7 @@ class H4 {
   Middleware _onRequestHandler;
   // ignore: prefer_function_declarations_over_variables
   void Function(String e, String? s, H4Event? event) _errorHandler =
-      (e, s, event) => print('$e/n $s/n ${event?.path}');
+      (e, s, event) => logger.info('$e/n $s/n ${event?.path}');
 
   int port = 3000;
 
@@ -56,7 +56,7 @@ class H4 {
       );
       _bootstrap();
     } catch (e) {
-      logger.e(e.toString());
+      logger.severe(e.toString());
       return null;
     }
     return this;
@@ -134,7 +134,7 @@ class H4 {
   _bootstrap() {
     server?.listen((HttpRequest request) {
       if (router == null) {
-        logger.w(
+        print(
             "No router is defined, it is recommended to use createRouter() to define a router.");
       }
 
@@ -178,13 +178,19 @@ class H4 {
       /// It returns a function that is invoked with the incoming request which sends a JSON payload to the client with the error details.
       on CreateError catch (e, trace) {
         defineErrorHandler(_errorHandler,
-            params: params, error: e.message, trace: trace)(request);
+            params: params,
+            error: e.message,
+            trace: trace,
+            statusCode: e.errorCode)(request);
       }
 
       /// Catch non-explicity error when they occur and send a JSON payload to the client.
       catch (e, trace) {
         defineErrorHandler(_errorHandler,
-            params: params, error: e.toString(), trace: trace)(request);
+            params: params,
+            error: e.toString(),
+            trace: trace,
+            statusCode: 500)(request);
       }
     });
   }

@@ -34,55 +34,7 @@ Function(HttpRequest) defineEventHandler(
 
     // Call the handler with the event.
     var handlerResult = handler(event);
-
-    if (handlerResult == null) {
-      event.setResponseFormat("null");
-      event.respond(handlerResult);
-      return;
-    }
-
-    if (handlerResult is String) {
-      event.setResponseFormat("html");
-      event.respond(handlerResult);
-      return;
-    }
-
-    if (handlerResult is DateTime) {
-      event.setResponseFormat("text");
-      event.respond(handlerResult.toIso8601String());
-      return;
-    }
-
-    if (handlerResult is Map || handlerResult is List || handlerResult is Set) {
-      event.setResponseFormat("json");
-      // Encode to jsonString and return
-      handlerResult = jsonEncode(handlerResult);
-      event.respond(handlerResult);
-      return;
-    }
-
-    if (handlerResult is Future) {
-      handlerResult
-          .then((value) => event.respond(value))
-          .onError((error, stack) {
-        // event.setResponseFormat("json");
-        // event.statusCode = 500;
-        // var response = {
-        //   "message": error.toString(),
-        //   "statusCode": 500,
-        //   "statusMessage": "Internal Server Error"
-        // };
-        // event.respond(jsonEncode(response));
-      });
-      return;
-    }
-
-    /// If the [EventHandler] returns a value of type Bool, RegExp, Uri, Symbol or Num set the response format to 'text/plain'
-    ///
-    /// Serialize the value and send it as a response.
-    event.setResponseFormat("text");
-    event.respond(handlerResult.toString());
-    return;
+    event.respond(handlerResult);
   };
 }
 

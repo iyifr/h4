@@ -1,6 +1,6 @@
 name: h4
 description: A minimal HTTP framework for building elegant server applications.
-version: 0.0.3
+version: 0.0.4
 repository: https://github.com/iyifr/h4
 
 environment:
@@ -14,10 +14,11 @@ topics:
 # Add regular dependencies here.
 dependencies:
   meta: ^1.15.0
-  # path: ^1.8.0
-  logger: ^2.3.0
+  compute: ^1.0.2
+  logging: ^1.2.0
+  either_dart: ^1.0.0
 
 dev_dependencies:
-  lints: ^3.0.0
+  lints: ^4.0.0
   test: ^1.24.0
   dio: ^5.4.3+1

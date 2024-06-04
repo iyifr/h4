@@ -1,5 +1,7 @@
+import 'dart:convert';
 import 'dart:core';
 import 'dart:io';
+import 'package:h4/src/logger.dart';
 
 /// Represents an event in the H4 framework.
 ///
@@ -77,7 +79,7 @@ class H4Event {
         _request.response.statusCode = 204;
         break;
       default:
-        throw ArgumentError('Invalid response format: $type');
+        logger.warning('Invalid response format: $type');
     }
   }
 
@@ -90,14 +92,72 @@ class H4Event {
       return;
     }
 
-    if (handlerResult == null) {
-      _request.response.close();
-      _handled = true;
-    } else {
-      // Write the handler result to the response and close.
-      _request.response.write(handlerResult);
-      _request.response.close();
-      _handled = true;
+    // Handle Async Handler
+    if (handlerResult is Future) {
+      handlerResult
+          .then((value) => resolveHandler(this, value))
+          .onError((error, stackTrace) {
+        statusCode = 500;
+        var errResponse = {
+          "error": error.toString(),
+          "statusMessage": "Internal sever error"
+        };
+        setResponseFormat("json");
+        writeToClient(jsonEncode(errResponse));
+      });
+      return;
     }
+
+    resolveHandler(this, handlerResult);
   }
+
+  void writeToClient(dynamic value) {
+    _request.response.write(value);
+    shutDown();
+    _handled = true;
+  }
+
+  void shutDown() {
+    _request.response.close();
+  }
+}
+
+setEventResponseFormat(H4Event event, handlerResult) {
+  if (handlerResult == null) {
+    event.setResponseFormat("null");
+  } else if (handlerResult is String) {
+    event.setResponseFormat("html");
+  } else if (handlerResult is Map ||
+      handlerResult is List ||
+      handlerResult is Set) {
+    event.setResponseFormat("json");
+  } else {
+    event.setResponseFormat('text');
+  }
+}
+
+resolveHandler(H4Event event, handlerResult) {
+  // Don't write anything to the client, shut it down.
+  // ignore: type_check_with_null
+  if (handlerResult is Null) {
+    setEventResponseFormat(event, handlerResult);
+    event.shutDown();
+  }
+
+  if (handlerResult is Map || handlerResult is List || handlerResult is Set) {
+    // Encode to jsonString and return
+    setEventResponseFormat(event, handlerResult);
+    handlerResult = jsonEncode(handlerResult);
+    event.writeToClient(handlerResult);
+    return;
+  }
+
+  if (handlerResult is DateTime) {
+    setEventResponseFormat(event, handlerResult);
+    event.writeToClient(handlerResult.toIso8601String());
+    return;
+  }
+
+  setEventResponseFormat(event, handlerResult);
+  event.writeToClient(handlerResult);
 }
