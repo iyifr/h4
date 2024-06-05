@@ -73,7 +73,7 @@ app.use(router);
 Specify the return type of your handlers
 
 ```dart
- router.get<bool>("/25/**", (event) => true);
+router.get<bool>("/25/**", (event) => true);
 ```
 
 ### Middleware
@@ -103,7 +103,7 @@ router.get('/error', (event) {
   // Code that could fail.
   }
   catch(e) {
-    throw CreateError(message: 'Something went wrong', errorCode: 400);
+    throw CreateError(message: 'Error - $e', errorCode: 400);
   }
 });
 ```
@@ -113,7 +113,7 @@ The client recieves this json payload -
 ```json
 {
  "status": 400,
- "message": "An error ocurred"
+ "message": "[Error message]"
 }
 ```
 
