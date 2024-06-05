@@ -161,3 +161,4 @@ resolveHandler(H4Event event, handlerResult) {
   setEventResponseFormat(event, handlerResult);
   event.writeToClient(handlerResult);
 }
+

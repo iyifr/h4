@@ -81,14 +81,14 @@ Apologies for any distruptions, we are now prioritizing mature and stable develo
 
     ```json
     {
-    	"message": "Error message",
-    	"statusMessage": "Internal server error",
-    	"statusCode": 500
+     "message": "Error message",
+     "statusMessage": "Internal server error",
+     "statusCode": 500
     }
     ```
 
     TODO - onError handler does not run when errors are thrown async event handlers. (Fix in next
-    minor patc)
+    few patches)
 
   - Support for extended server configuration : You can now specify if you want to start
     automatically or not. In the future you will be able to pass your own customer server and listen
@@ -103,4 +103,23 @@ Apologies for any distruptions, we are now prioritizing mature and stable develo
       };
     ```
 
-    In the next patch release more server configuration objects will be added.
+## 0.0.5
+
+- ### New & Improved
+
+  - Improved internal composition for handling responses of different response types and setting
+    content type headers.
+
+  - Improved error handling when `Futures` are returned from handlers.
+
+  - New `readRequestBody` utility - Can only read _json_ and _text_ right now. Support for more body
+    types to be added.
+    ```dart
+    router.post("/vamos", (event) async {
+      var body = await readRequestBody(event);
+      return body;
+    });
+    ```
+
+- ### TODO
+  - Allow handler to set content type of response with `setResponseHeaders` utility.
