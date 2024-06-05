@@ -1,5 +1,5 @@
 import 'package:h4/src/h4.dart';
-import 'package:h4/src/index.dart';
+import 'package:h4/src/router.dart';
 
 /// Constructs an instance of the `H4` class, which is the main entry point for
 /// your application.
