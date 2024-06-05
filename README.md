@@ -9,13 +9,16 @@
 
 **Do not use in production as it could break unexpectedly.**
 
-You're welcome to try it out, see what breaks and give feedback.
-There's already an express.js implementation called `Alfred` in the dart ecosystem.
-This is the [H3](https://h3.unjs.io) implementation with similar design goals.
-Special thanks to [Pooya Parsa](https://github.com/pi0) and the [Unjs](https://github.com/unjs) community for making a great library. 
+You're welcome to try it out, see what breaks and give feedback. 
+
+There's already an express.js implementation called `Alfred` in the dart ecosystem. 
+
+This is the [H3](https://h3.unjs.io) implementation with similar design goals. 
+Special thanks to [Pooya Parsa](https://github.com/pi0) and the [Unjs](https://github.com/unjs) community for making a great library.
 
 ## Features
-- **Lightweight**: H4 ships with a small core with a set of composable utilities being added for functionality.
+
+- **Lightweight**: H4 ships with a small core and a set of composable utilities.
 - **Fast**: H4's trie-based router is incredibly fast, with support for route params and wildcard
   patterns.
 - **Middleware**: H4 comes with built-in `onRequest` and `onError` middleware.
@@ -73,7 +76,6 @@ Specify the return type of your handlers
  router.get<bool>("/25/**", (event) => true);
 ```
 
-
 ### Middleware
 
 H4 provides two middleware functions out of the box.
@@ -116,7 +118,9 @@ The client recieves this json payload -
 ```
 
 ### Param Routing
+
 You can define parameters in your routes using `:` prefix:
+
 ```dart
 router.get('/users/:id', (event) {
  final userId = event.params['id'];
@@ -125,6 +129,7 @@ router.get('/users/:id', (event) {
 ```
 
 ### Wildcard Routing
+
 ```dart
 // Matches 'articles/page' and '/articles/otherPage' but not 'articles/page/otherPage'
 router.get('/articles/*', (event) {
@@ -143,13 +148,17 @@ router.get('/articles/**', (event) {
 
 ## Utilities
 
-This is a design philosophy from [h3](https://h3.unjs.io). Using composable utils to add
-functionality to your server.
+This is a design philosophy from [h3](https://h3.unjs.io).
+
+I'm working on adding an exhaustive list of composable utilities for adding functionality to your
+server.
 
 Support for more utilities will be added soon along with a guide to creating your own.
 
 ### `readRequestBody`
+
 Reads the request body as `json` or `text` depending on the content type of the request body.
+
 ```dart
 router.post("/vamos", (event) async {
   var body = await readRequestBody(event);
@@ -167,8 +176,9 @@ If you find a bug or have an idea for a new feature, please
 [open an issue](https://github.com/iyifr/h4/issues/new) or submit a pull request.
 
 ### First Contribution
-A good first PR would be helping me improve the test coverage of this library. 
-Or adding one of the utilities listed [here](https://h3.unjs.io/utils).
+
+A good first PR would be helping me improve the test coverage of this library. Or adding one of the
+utilities listed [here](https://h3.unjs.io/utils).
 
 ## Code of Conduct.
 
