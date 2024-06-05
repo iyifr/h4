@@ -99,12 +99,12 @@ response
 
 ```dart
 router.get('/error', (event) {
-  try {
+ try {
   // Code that could fail.
-  }
-  catch(e) {
-    throw CreateError(message: 'Error - $e', errorCode: 400);
-  }
+ }
+ catch(e) {
+   throw CreateError(message: 'Error - $e', errorCode: 400);
+ }
 });
 ```
 
@@ -150,10 +150,9 @@ router.get('/articles/**', (event) {
 
 This is a design philosophy from [h3](https://h3.unjs.io).
 
-I'm working on adding an exhaustive list of composable utilities for adding functionality to your
-server.
+I'm working on adding an exhaustive list of composable utilities for easily extending functionality of your server.
 
-Support for more utilities will be added soon along with a guide to creating your own.
+More utilities will be added with each release and soon a guide to creating your own utils will be published.
 
 ### `readRequestBody`
 
@@ -161,8 +160,8 @@ Reads the request body as `json` or `text` depending on the content type of the 
 
 ```dart
 router.post("/vamos", (event) async {
-  var body = await readRequestBody(event);
-  return body;
+ var body = await readRequestBody(event);
+ return body;
 });
 ```
 
