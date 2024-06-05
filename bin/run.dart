@@ -24,7 +24,7 @@ void main(List<String> arguments) async {
       print('Error occured at ${event?.path}\n$error'));
 
   router.get<bool>("/25/**", (event) => true);
-  
+
   router.get("/:id", (event) {
     print('param: ${event.params["id"]}');
     return 'Hey';
@@ -35,9 +35,10 @@ void main(List<String> arguments) async {
     return body;
   });
 
-  router.get('/error', (event) async {
+  router.get<Future<int>>('/int', (event) async {
     await Future.delayed(Duration(seconds: 1));
-    throw Exception("Wahala");
+    var res = await Future.value(23994);
+    return res;
   });
 
   router.get("/vamos", (event) {

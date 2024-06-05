@@ -50,4 +50,4 @@ Function(HttpRequest) defineEventHandler(
 /// - List<T>: A list of items of various types
 /// - Map<T>: A standard dart Map.
 ///
-typedef EventHandler<T> = FutureOr<T> Function(H4Event event);
+typedef EventHandler<T> = T Function(H4Event event);
