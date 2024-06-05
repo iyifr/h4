@@ -2,18 +2,24 @@
 
 ![og](https://assets.uploadfast.dev/h4-dev.png)
 
-> H4 is a **lightweight**, **minimal**, and **blazing fast** HTTP framework for productive and fun
-> API development with dart.
+> A **lightweight**, **minimal**, and **incredibly fast** HTTP framework for productive and fun API
+> development with dart.
 
-**H4 is a new framework under active development. It's not yet ready for production use.**
+**This is a very new project under active development**
+
+**Do not use in production as it could break unexpectedly.**
+
+You're welcome to try it out, see what breaks and give feedback.
+There's already an express.js implementation called `Alfred` in the dart ecosystem.
+This is the [H3](https://h3.unjs.io) implementation with similar design goals.
+Special thanks to [Pooya Parsa](https://github.com/pi0) and the [Unjs](https://github.com/unjs) community for making a great library. 
 
 ## Features
-
-- **Lightweight**: H4 is designed to be minimal and easy to get started with.
+- **Lightweight**: H4 ships with a small core with a set of composable utilities being added for functionality.
 - **Fast**: H4's trie-based router is incredibly fast, with support for route params and wildcard
   patterns.
 - **Middleware**: H4 comes with built-in `onRequest` and `onError` middleware.
-- **Error Handling**: H4's `createError` exception makes it easy to handle and respond to errors.
+- **Generic Handlers**: Specify the return type of your handler functions for increased type safety.
 
 ## Getting Started
 
@@ -47,27 +53,38 @@ void main() {
 
 ## Examples
 
-### Routing with Params
-
-You can define parameters in your routes using : prefix:
+### Manual Start
 
 ```dart
-router.get('/users/:id', (event) {
- final userId = event.params['id'];
- return 'User $userId'
-});
+var app = createApp(port: 4000, autoStart: false);
+
+app.start().then((h4) => print(h4?.port));
+
+var router = createRouter();
+
+app.use(router);
 ```
+
+### Generic handlers
+
+Specify the return type of your handlers
+
+```dart
+ router.get<bool>("/25/**", (event) => true);
+```
+
 
 ### Middleware
 
-H4 provides two middleware functions. Do not return anything from middleware as this will terminate
-the request.
+H4 provides two middleware functions out of the box.
 
 ```dart
+// Invoked when a request comes in
 app.onRequest((event) {
  print('Incoming request method: ${event.method}');
 });
 
+// Global error handler - Called when an error occurs in non-async handlers
 app.onError((error) {
  print("$error");
 });
@@ -80,7 +97,12 @@ response
 
 ```dart
 router.get('/error', (event) {
- throw CreateError(message: 'Something went wrong', errorCode: 400);
+  try {
+  // Code that could fail.
+  }
+  catch(e) {
+    throw CreateError(message: 'Something went wrong', errorCode: 400);
+  }
 });
 ```
 
@@ -93,8 +115,16 @@ The client recieves this json payload -
 }
 ```
 
-### Wildcard Routing
+### Param Routing
+You can define parameters in your routes using `:` prefix:
+```dart
+router.get('/users/:id', (event) {
+ final userId = event.params['id'];
+ return 'User $userId'
+});
+```
 
+### Wildcard Routing
 ```dart
 // Matches 'articles/page' and '/articles/otherPage' but not 'articles/page/otherPage'
 router.get('/articles/*', (event) {
@@ -111,6 +141,22 @@ router.get('/articles/**', (event) {
 });
 ```
 
+## Utilities
+
+This is a design philosophy from [h3](https://h3.unjs.io). Using composable utils to add
+functionality to your server.
+
+Support for more utilities will be added soon along with a guide to creating your own.
+
+### `readRequestBody`
+Reads the request body as `json` or `text` depending on the content type of the request body.
+```dart
+router.post("/vamos", (event) async {
+  var body = await readRequestBody(event);
+  return body;
+});
+```
+
 ## Contributing
 
 We are looking for contributors!
@@ -120,7 +166,11 @@ There's still quite a bit of work to do to get H4 to 1.0.0 and ready for product
 If you find a bug or have an idea for a new feature, please
 [open an issue](https://github.com/iyifr/h4/issues/new) or submit a pull request.
 
+### First Contribution
+A good first PR would be helping me improve the test coverage of this library. 
+Or adding one of the utilities listed [here](https://h3.unjs.io/utils).
+
 ## Code of Conduct.
 
-Everyone is welcome here! Good vibes only. Show respect and consideration for others when creating
-issues and contributing to the library.
+Show respect and consideration for others when creating issues and contributing to the library. Only
+good vibes!

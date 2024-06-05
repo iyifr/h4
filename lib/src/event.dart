@@ -111,12 +111,21 @@ class H4Event {
     resolveHandler(this, handlerResult);
   }
 
+  /// Avoid using this method in handlers and middleware.
+  ///
+  /// In handlers return the value instead of writing to the client directly.
+  ///
+  /// In middleware, your functions should void and not return anything to the client.
+  /// They should only run side effects.
   void writeToClient(dynamic value) {
     _request.response.write(value);
     shutDown();
     _handled = true;
   }
 
+  /// Will close the response `IOSink` and complete the request.
+  ///
+  /// Avoid calling this in handlers and middleware.
   void shutDown() {
     _request.response.close();
   }
@@ -161,4 +170,3 @@ resolveHandler(H4Event event, handlerResult) {
   setEventResponseFormat(event, handlerResult);
   event.writeToClient(handlerResult);
 }
-
