@@ -96,9 +96,6 @@ class H4 {
   ///
   ///   // Validate the request data
   ///   validateRequestData(event);
-  ///
-  ///   // Do not return anything from middleware🚫
-  ///   // This terminates the request.
   /// });
   /// ```
   void onRequest(Middleware func) {
@@ -158,10 +155,10 @@ class H4 {
           defineEventHandler((event) {
             event.statusCode = 404;
             return {
-              "status": 404,
+              "statusCode": 404,
               "statusMessage": "Not found",
               "message":
-                  "No handler found for ${event.method.toUpperCase()} request to path - ${event.path}"
+                  "Cannot ${event.method.toUpperCase()} - ${event.path}"
             };
           }, onRequest: _onRequestHandler, params: params)(request);
           return;

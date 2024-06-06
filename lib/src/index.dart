@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:core';
 import 'dart:io';
 import 'package:h4/src/event.dart';
@@ -37,17 +36,9 @@ Function(HttpRequest) defineEventHandler(
 /// A function type alias for event handlers in the H4 framework.
 ///
 /// The `EventHandler` type represents a function that takes an [H4Event] as input and
-/// returns a `FutureOr<T>`, where `T` is the type of the function response.
+/// returns a `T`, where `T` is the return type of the event handler.
 ///
-/// Handlers can be asynchronous and return a Future, or they may not be Future.
-/// Hence the FutureOr<T> type.
+/// It represents the type of data you want to send back to the client.
 ///
-/// Only serializable objects are appropriate return types for handlers
-///
-/// The supported types are:
-/// - Boolean: Sets the content type of the response to text/plain'
-/// - String: Sets the content type of the response to 'application/html'
-/// - List<T>: A list of items of various types
-/// - Map<T>: A standard dart Map.
-///
+/// Only serializable objects are appropriate return types for handlerss
 typedef EventHandler<T> = T Function(H4Event event);
