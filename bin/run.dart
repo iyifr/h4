@@ -17,17 +17,15 @@ void main(List<String> arguments) async {
   app.use(router);
 
   app.onRequest((event) {
-    print(event.path);
+    print(event.params);
   });
 
   app.onError((error, stack, event) =>
       print('Error occured at ${event?.path}\n$error'));
 
-  router.get<bool>("/25/**", (event) => true);
 
   router.get("/:id", (event) {
-    print('param: ${event.params["id"]}');
-    return 'Hey';
+    return 'Hey ${event.params["id"]}';
   });
 
   router.post("/vamos", (event) async {

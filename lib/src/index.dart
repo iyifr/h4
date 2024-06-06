@@ -23,6 +23,7 @@ Function(HttpRequest) defineEventHandler(
     event.eventParams = params ?? {};
 
     // If onRequest is defined, call it with the event.
+
     if (onRequest != null) {
       onRequest(event);
     }

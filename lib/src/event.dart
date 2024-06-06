@@ -167,6 +167,7 @@ resolveHandler(H4Event event, handlerResult) {
     return;
   }
 
+  // Another data type will be stringified by HttpResponse.write()
   setEventResponseFormat(event, handlerResult);
   event.writeToClient(handlerResult);
 }

@@ -130,6 +130,15 @@ class H4 {
   }
 
   _bootstrap() {
+    // var newStream = server?.asBroadcastStream();
+
+    // newStream?.listen((HttpRequest req) {
+    //   var event = H4Event(req);
+    //   var params = router?.getParams(req.uri.path);
+    //   event.eventParams = params ?? {};
+    //   _onRequestHandler!(event);
+    // });
+
     server?.listen((HttpRequest request) {
       if (router == null) {
         print(
@@ -157,8 +166,7 @@ class H4 {
             return {
               "statusCode": 404,
               "statusMessage": "Not found",
-              "message":
-                  "Cannot ${event.method.toUpperCase()} - ${event.path}"
+              "message": "Cannot ${event.method.toUpperCase()} - ${event.path}"
             };
           }, onRequest: _onRequestHandler, params: params)(request);
           return;
