@@ -49,12 +49,20 @@ class H4Router {
   /// This returns an object that contains the following:
   /// - A normalized request method string [GET, POST, PUT, DELETE, PATCH]
   Map<String, EventHandler?>? lookup(path) {
-    var result = routes.search(extractPieces(path));
+    var pathChunks = extractPieces(path);
+    var result = routes.search(pathChunks);
 
-    // If we can't find named route, checked for param route.
-    result ??= routes.matchParamRoute(extractPieces(path));
-    result ??= routes.matchWildCardRoute(extractPieces(path));
+    if (pathChunks
+        .any((element) => element.startsWith(':') || element.startsWith('*'))) {
+      result ??= routes.matchParamRoute(extractPieces(path));
+    }
+
+    if (pathChunks.any((element) => element.startsWith('**'))) {
+      result ??= routes.matchWildCardRoute(extractPieces(path));
+    }
+
     return result;
+    // If we can't find named route, checked for param route.
   }
 
   Map<String, String> getParams(String path) {

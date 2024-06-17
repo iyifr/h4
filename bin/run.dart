@@ -23,8 +23,7 @@ void main(List<String> arguments) async {
   app.onError((error, stack, event) =>
       print('Error occured at ${event?.path}\n$error'));
 
-
-  router.get("/:id", (event) {
+  router.get("/i", (event) {
     return 'Hey ${event.params["id"]}';
   });
 
