@@ -16,6 +16,8 @@ Function(HttpRequest) defineEventHandler(
   Map<String, String>? params,
 }) {
   return (HttpRequest request) {
+    request.response.headers.removeAll(HttpHeaders.contentTypeHeader);
+
     // Create an event with the incoming request.
     var event = H4Event(request);
 

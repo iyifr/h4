@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:h4/src/event.dart';
 import 'package:h4/src/h4.dart';
+import 'package:h4/utils/set_response_header.dart';
 
 ///
 /// The `defineErrorHandler` function takes three parameters:
@@ -47,7 +48,8 @@ Function(HttpRequest) defineErrorHandler(ErrorHandler handler,
     handler(error, trace.toString(), event);
 
     event.statusCode = statusCode;
-    event.setResponseFormat('json');
+    setResponseHeader(event, HttpHeaders.contentTypeHeader,
+        value: 'application/json');
     var response = {"statusCode": statusCode, "message": error.toString()};
     event.writeToClient(jsonEncode(response));
   };

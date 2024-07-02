@@ -6,17 +6,19 @@ import 'package:either_dart/either.dart';
 import 'package:h4/src/event.dart';
 import 'package:h4/src/logger.dart';
 
+
+/// Read the body of the request.
 Future<dynamic> readRequestBody(H4Event event) async {
   var request = event.node["value"];
 
   if (request != null) {
     var parsedBody = await parseRequestBody(request);
-    return parsedBody ?? 'NADA';
+    return parsedBody;
   }
 }
 
 Future<dynamic> parseRequestBody(HttpRequest request,
-    {Duration timeout = const Duration(seconds: 180)}) async {
+    {Duration timeout = const Duration(seconds: 360)}) async {
   var bodyType = request.headers.contentType?.mimeType;
 
   try {

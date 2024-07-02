@@ -52,17 +52,11 @@ class H4Router {
     var pathChunks = extractPieces(path);
     var result = routes.search(pathChunks);
 
-    if (pathChunks
-        .any((element) => element.startsWith(':') || element.startsWith('*'))) {
-      result ??= routes.matchParamRoute(extractPieces(path));
-    }
+    result ??= routes.matchParamRoute(pathChunks);
 
-    if (pathChunks.any((element) => element.startsWith('**'))) {
-      result ??= routes.matchWildCardRoute(extractPieces(path));
-    }
+    result ??= routes.matchWildCardRoute(extractPieces(path));
 
     return result;
-    // If we can't find named route, checked for param route.
   }
 
   Map<String, String> getParams(String path) {

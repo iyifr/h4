@@ -19,9 +19,10 @@ class H4 {
   Middleware _onRequestHandler;
   // ignore: prefer_function_declarations_over_variables
   void Function(String e, String? s, H4Event? event) _errorHandler =
-      (e, s, event) => logger.info('$e/n $s/n ${event?.path}');
+      (e, s, event) => logger.severe(
+          'Stack Trace \n $e \n $s \n Error occured at path -${event?.path}');
 
-  int port = 3000;
+  int? port;
 
   /// Constructs an instance of the `H4` class, which is the main entry point for
   /// your application.
@@ -44,8 +45,7 @@ class H4 {
   /// // Start the application on the default port (3000)
   /// final app = H4();
   /// ```
-  H4({int? port, bool autoStart = true}) {
-    this.port = port ?? 3000;
+  H4({this.port, bool autoStart = true}) {
     autoStart ? start() : null;
   }
 
@@ -53,7 +53,7 @@ class H4 {
   Future<H4?> start() async {
     try {
       server = await initializeHttpConnection(
-        port: port,
+        port: port ?? 3000,
       );
       _bootstrap();
     } catch (e) {

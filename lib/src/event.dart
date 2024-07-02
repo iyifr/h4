@@ -49,7 +49,9 @@ class H4Event {
   /// You cannot mutate the request directly.
   Map<String, HttpRequest> get node => {'value': _request};
 
-  HttpHeaders get headers => _request.headers;
+  _isHeaderSet(String header) {
+    return _request.response.headers[header] == null ? false : true;
+  }
 
   /// Sets the response format to the specified [type].
   ///
@@ -62,18 +64,23 @@ class H4Event {
   /// Throws an [ArgumentError] if an invalid [type] is provided.
 
   void setResponseFormat(String type) {
+    var headers = _request.response.headers;
+
+    if (_isHeaderSet(HttpHeaders.contentTypeHeader)) {
+      return;
+    }
+
     switch (type) {
       case 'html':
-        _request.response.headers
-            .add(HttpHeaders.contentTypeHeader, 'text/html');
+        headers.add(HttpHeaders.contentTypeHeader, 'text/html');
         break;
+
       case 'text':
-        _request.response.headers
-            .add(HttpHeaders.contentTypeHeader, 'text/plain');
+        headers.add(HttpHeaders.contentTypeHeader, 'text/plain');
         break;
+
       case 'json':
-        _request.response.headers
-            .add(HttpHeaders.contentTypeHeader, 'application/json');
+        headers.add(HttpHeaders.contentTypeHeader, 'application/json');
         break;
       case 'null':
         _request.response.statusCode = 204;
@@ -100,7 +107,7 @@ class H4Event {
         statusCode = 500;
         var errResponse = {
           "error": error.toString(),
-          "statusMessage": "Internal sever error"
+          "statusMessage": "Internal server error"
         };
         setResponseFormat("json");
         writeToClient(jsonEncode(errResponse));
@@ -108,6 +115,7 @@ class H4Event {
       return;
     }
 
+    // Handle non-async handler.
     resolveHandler(this, handlerResult);
   }
 
@@ -116,7 +124,7 @@ class H4Event {
   /// In handlers return the value instead of writing to the client directly.
   ///
   /// In middleware, your functions should void and not return anything to the client.
-  /// They should only run side effects.
+  /// Middleware should only run side effects.
   void writeToClient(dynamic value) {
     _request.response.write(value);
     shutDown();
@@ -131,43 +139,28 @@ class H4Event {
   }
 }
 
-setEventResponseFormat(H4Event event, handlerResult) {
-  if (handlerResult == null) {
-    event.setResponseFormat("null");
-  } else if (handlerResult is String) {
-    event.setResponseFormat("html");
-  } else if (handlerResult is Map ||
-      handlerResult is List ||
-      handlerResult is Set) {
-    event.setResponseFormat("json");
-  } else {
-    event.setResponseFormat('text');
-  }
-}
-
 resolveHandler(H4Event event, handlerResult) {
-  // Don't write anything to the client, shut it down.
   // ignore: type_check_with_null
   if (handlerResult is Null) {
-    setEventResponseFormat(event, handlerResult);
-    event.shutDown();
+    event.setResponseFormat('null');
+    event.writeToClient('No content');
+    return;
   }
 
   if (handlerResult is Map || handlerResult is List || handlerResult is Set) {
-    // Encode to jsonString and return
-    setEventResponseFormat(event, handlerResult);
+    event.setResponseFormat("json");
     handlerResult = jsonEncode(handlerResult);
     event.writeToClient(handlerResult);
     return;
   }
 
+  // Just in case the user is quirky.
   if (handlerResult is DateTime) {
-    setEventResponseFormat(event, handlerResult);
+    event.setResponseFormat('text');
     event.writeToClient(handlerResult.toIso8601String());
     return;
   }
 
-  // Another data type will be stringified by HttpResponse.write()
-  setEventResponseFormat(event, handlerResult);
+  // Any other data type will be stringified by HttpResponse.write()
   event.writeToClient(handlerResult);
 }

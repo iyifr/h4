@@ -1,9 +1,14 @@
 // import 'package:console/console.dart' as console;
 
+import 'dart:io';
+
 import 'package:h4/create.dart';
 import 'package:h4/src/create_error.dart';
 import 'package:h4/src/logger.dart';
+import 'package:h4/utils/get_header.dart';
+import 'package:h4/utils/get_query.dart';
 import 'package:h4/utils/read_request_body.dart';
+import 'package:h4/utils/set_response_header.dart';
 
 void main(List<String> arguments) async {
   initLogger();
@@ -16,20 +21,22 @@ void main(List<String> arguments) async {
 
   app.use(router);
 
-  app.onRequest((event) {
-    print(event.params);
+  router.get('/', (event) {
+    return null;
   });
 
-  app.onError((error, stack, event) =>
-      print('Error occured at ${event?.path}\n$error'));
-
-  router.get("/i", (event) {
-    return 'Hey ${event.params["id"]}';
+  router.get("/hi/:id", (event) {
+    throw Exception('Yo');
+    // return 'Hey ${event.params["id"]}';
   });
 
   router.post("/vamos", (event) async {
     var body = await readRequestBody(event);
-    return body;
+    var header = getHeader(event, HttpHeaders.viaHeader);
+    var query = getQueryParams(event);
+    setResponseHeader(event, HttpHeaders.contentTypeHeader,
+        value: 'application/json');
+    return [header, body, query];
   });
 
   router.get<Future<int>>('/int', (event) async {

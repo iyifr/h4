@@ -81,9 +81,9 @@ Apologies for any distruptions, we are now prioritizing mature and stable develo
 
     ```json
     {
-     "message": "Error message",
-     "statusMessage": "Internal server error",
-     "statusCode": 500
+    	"message": "Error message",
+    	"statusMessage": "Internal server error",
+    	"statusCode": 500
     }
     ```
 
@@ -123,3 +123,11 @@ Apologies for any distruptions, we are now prioritizing mature and stable develo
 
 - ### TODO
   - Allow handler to set content type of response with `setResponseHeaders` utility.
+
+## 0.1.0
+
+- ### First Minor Release
+  - Added new `getQueryParams` utility for extracting query params in the request URL
+  - Added new `getHeader` utility to get specific headers from the incoming request
+  - Added new `getRequestHeaders` utility to get all defined request headers
+  - Added new `setResponseHeaders` utility to manually set response headers 
