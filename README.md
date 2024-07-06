@@ -173,14 +173,8 @@ router.post("/vamos", (event) async {
 });
 ```
 
-```dart
-router.post("/vamos", (event) async {
- var body = await readRequestBody(event);
- return body;
-});
-```
-
 ## Contributing
+
 Contributors needed!
 
 There's quite a bit of work to do to get H4 to 1.0.0 and ready for production use.
@@ -189,11 +183,14 @@ If you find a bug or have an idea for a new feature, please
 [open an issue](https://github.com/iyifr/h4/issues/new) or submit a pull request.
 
 ### First Contribution
+
 A good first PR would be helping me improve the test coverage of this library. Or adding one of the
 utilities listed [here](https://h3.unjs.io/utils).
 
 ### Running tests
+
 In the root directory run
+
 ```bash
 dart test
 ```

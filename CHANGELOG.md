@@ -130,4 +130,11 @@ Apologies for any distruptions, we are now prioritizing mature and stable develo
   - Added new `getQueryParams` utility for extracting query params in the request URL
   - Added new `getHeader` utility to get specific headers from the incoming request
   - Added new `getRequestHeaders` utility to get all defined request headers
-  - Added new `setResponseHeaders` utility to manually set response headers 
+  - Added new `setResponseHeaders` utility to manually set response headers
+
+## 0.1.1
+
+- ### Patch Release
+  - When the port assigned to server is taken, it now informs you that the port is taken and tries
+    to start the server on port - (previousPort + 1).
+  - Improved documentation comments for the added utilities in the last release.
