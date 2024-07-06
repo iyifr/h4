@@ -3,19 +3,13 @@
 import 'dart:io';
 
 import 'package:h4/create.dart';
-import 'package:h4/src/create_error.dart';
-import 'package:h4/src/logger.dart';
 import 'package:h4/utils/get_header.dart';
 import 'package:h4/utils/get_query.dart';
 import 'package:h4/utils/read_request_body.dart';
 import 'package:h4/utils/set_response_header.dart';
 
 void main(List<String> arguments) async {
-  initLogger();
-
-  var app = createApp(port: 4000, autoStart: false);
-
-  await app.start().then((h4) => logger.warning(h4?.port));
+  var app = createApp(port: 5173);
 
   var router = createRouter();
 
@@ -32,7 +26,7 @@ void main(List<String> arguments) async {
 
   router.post("/vamos", (event) async {
     var body = await readRequestBody(event);
-    var header = getHeader(event, HttpHeaders.viaHeader);
+    var header = getHeader(event, HttpHeaders.userAgentHeader);
     var query = getQueryParams(event);
     setResponseHeader(event, HttpHeaders.contentTypeHeader,
         value: 'application/json');
@@ -46,6 +40,6 @@ void main(List<String> arguments) async {
   });
 
   router.get("/vamos", (event) {
-    throw CreateError(message: 'A grave error happened', errorCode: 404);
+    throw CreateError(message: 'A grave error happened');
   });
 }

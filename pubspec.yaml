@@ -1,15 +1,15 @@
 name: h4
 description: A minimal HTTP framework for building elegant server applications.
-version: 0.1.0
+version: 0.1.1
 repository: https://github.com/iyifr/h4
 
 environment:
   sdk: ^3.3.0
 
 topics:
-  - http
+  - http-framework
   - server
-  - http-framework.
+  - api
 
 # Add regular dependencies here.
 dependencies:

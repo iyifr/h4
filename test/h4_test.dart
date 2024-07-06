@@ -13,10 +13,11 @@ void main() {
     baseUrl: Uri.decodeFull("http://localhost:8000"),
   );
   Dio dio = Dio(config);
+  app = createApp(port: 8000);
+  app.use(router);
 
-  setUp(() {
-    app = createApp(port: 8000);
-    app?.use(router);
+  tearDownAll(() async {
+    await app?.close();
   });
 
   test('Initializes server correctly', () async {

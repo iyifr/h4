@@ -1,19 +1,21 @@
 import 'dart:io';
 
+/// Custom HTTP exception class for creating and throwing errors.
 class CreateError implements HttpException {
+  /// Message to send to the client.
   @override
-
-  /// Message to send to client.
   final String message;
 
   /// HTTP status code (defaults to 400).
   final int errorCode;
 
-  ///  * Creates a new `Error` that can be used to handle both internal and runtime errors.
+  /// Constructs a `CreateError` instance.
   ///
-  ///  * Pass an error message
+  /// Throws a custom error with the provided message and optional HTTP status code.
   ///
-  /// * Pass a http status code (defaults to 400) (optional)
+  /// Parameters:
+  /// - `message`: The error message to be sent to the client.
+  /// - `errorCode`: The HTTP status code for the error (defaults to 400 if not provided).
   CreateError({
     required this.message,
     this.errorCode = 400,

@@ -5,24 +5,21 @@
 > A **lightweight**, **minimal**, and **incredibly fast** HTTP framework for productive and fun API
 > development with dart.
 
-**This is a very new project under active development**
+**This is a new project under active development**
 
 **Do not use in production as it could break unexpectedly.**
 
-You're welcome to try it out, see what breaks and give feedback. 
+There's an express-like server framework called `Alfred` in the dart ecosystem.
 
-There's already an express.js implementation called `Alfred` in the dart ecosystem. 
-
-This is the [H3](https://h3.unjs.io) implementation with similar design goals. 
-Special thanks to [Pooya Parsa](https://github.com/pi0) and the [Unjs](https://github.com/unjs) community for making a great library.
+This is the [H3](https://h3.unjs.io) implementation with similar design goals. Special thanks to
+[Pooya Parsa](https://github.com/pi0) and the [Unjs](https://github.com/unjs) community for making a
+awesome http library.
 
 ## Features
 
 - **Lightweight**: H4 ships with a small core and a set of composable utilities.
-- **Fast**: H4's trie-based router is incredibly fast, with support for route params and wildcard
-  patterns.
 - **Middleware**: H4 comes with built-in `onRequest` and `onError` middleware.
-- **Generic Handlers**: Specify the return type of your handler functions for increased type safety.
+- **Generic Handlers**: Specify the return type of your handler functions.
 
 ## Getting Started
 
@@ -59,13 +56,16 @@ void main() {
 ### Manual Start
 
 ```dart
-var app = createApp(port: 4000, autoStart: false);
+void main() {
+  var app = createApp(port: 4000, autoStart: false);
+  var router = createRouter();
 
-app.start().then((h4) => print(h4?.port));
+  app.use(router);
 
-var router = createRouter();
+  router.get("/hi", (event) => "Hi")
 
-app.use(router);
+  app.start()
+}
 ```
 
 ### Generic handlers
@@ -103,7 +103,7 @@ router.get('/error', (event) {
   // Code that could fail.
  }
  catch(e) {
-   throw CreateError(message: 'Error - $e', errorCode: 400);
+   throw CreateError(message: 'Womp Womp', errorCode: 400);
  }
 });
 ```
@@ -148,15 +148,30 @@ router.get('/articles/**', (event) {
 
 ## Utilities
 
-This is a design philosophy from [h3](https://h3.unjs.io).
-
-I'm working on adding an exhaustive list of composable utilities for easily extending functionality of your server.
-
-More utilities will be added with each release and soon a guide to creating your own utils will be published.
+A set of composable utilities that help you add functionality to your server
 
 ### `readRequestBody`
 
-Reads the request body as `json` or `text` depending on the content type of the request body.
+Reads the request body as `json` or `text` depending on the `contentType` of the request body.
+
+```dart
+router.post("/vamos", (event) async {
+ var body = await readRequestBody(event);
+ return body;
+});
+```
+
+### `getHeader`
+
+Get the value of any of the incoming request headers. For convenience you can use the HTTPHeaders
+utility to get header strings.
+
+```dart
+router.post("/vamos", (event) async {
+ var header = getHeader(event, HttpHeaders.userAgentHeader);
+ return body;
+});
+```
 
 ```dart
 router.post("/vamos", (event) async {
@@ -166,18 +181,22 @@ router.post("/vamos", (event) async {
 ```
 
 ## Contributing
+Contributors needed!
 
-We are looking for contributors!
-
-There's still quite a bit of work to do to get H4 to 1.0.0 and ready for production use.
+There's quite a bit of work to do to get H4 to 1.0.0 and ready for production use.
 
 If you find a bug or have an idea for a new feature, please
 [open an issue](https://github.com/iyifr/h4/issues/new) or submit a pull request.
 
 ### First Contribution
-
 A good first PR would be helping me improve the test coverage of this library. Or adding one of the
 utilities listed [here](https://h3.unjs.io/utils).
+
+### Running tests
+In the root directory run
+```bash
+dart test
+```
 
 ## Code of Conduct.
 

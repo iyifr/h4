@@ -1,3 +1,4 @@
+export 'package:h4/src/create_error.dart';
 import 'package:h4/src/h4.dart';
 import 'package:h4/src/router.dart';
 
@@ -24,7 +25,7 @@ import 'package:h4/src/router.dart';
 /// final app = createApp(autoStart: false)
 /// await app.start().then((h4) => print('App started on ${h4.port}'))
 /// ```
-H4 createApp({int? port, bool autoStart = true}) {
+H4 createApp({int port = 3000, bool autoStart = true}) {
   return H4(port: port, autoStart: autoStart);
 }
 

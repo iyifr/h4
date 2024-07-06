@@ -6,8 +6,8 @@ import 'package:either_dart/either.dart';
 import 'package:h4/src/event.dart';
 import 'package:h4/src/logger.dart';
 
-
-/// Read the body of the request.
+/// Read the body of the incoming event request.
+/// Returns the request body either as parsed json or a string.
 Future<dynamic> readRequestBody(H4Event event) async {
   var request = event.node["value"];
 

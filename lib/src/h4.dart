@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:h4/src/create_error.dart';
 import 'package:h4/src/error_middleware.dart';
 import 'package:h4/src/logger.dart';
+import 'package:h4/src/port_taken.dart';
 import 'package:h4/src/router.dart';
 
 import '/src/index.dart';
@@ -22,7 +23,7 @@ class H4 {
       (e, s, event) => logger.severe(
           'Stack Trace \n $e \n $s \n Error occured at path -${event?.path}');
 
-  int? port;
+  int port;
 
   /// Constructs an instance of the `H4` class, which is the main entry point for
   /// your application.
@@ -45,22 +46,36 @@ class H4 {
   /// // Start the application on the default port (3000)
   /// final app = H4();
   /// ```
-  H4({this.port, bool autoStart = true}) {
-    autoStart ? start() : null;
+  H4({this.port = 3000, bool autoStart = true}) {
+    initLogger();
+
+    if (autoStart) {
+      start();
+    }
   }
 
   /// Initializes the server on **localhost** and starts listening for requests.
   Future<H4?> start() async {
     try {
+      var portReady = await isPortAvailable(port: port);
+
+      if (portReady == false) {
+        logger.info(
+            'Port $port is already taken, starting server on ${port + 1}');
+        port = port + 1;
+
+        start();
+      }
       server = await initializeHttpConnection(
-        port: port ?? 3000,
+        port: port,
       );
+      logger.info('Server started on port $port');
       _bootstrap();
+      return this;
     } catch (e) {
       logger.severe(e.toString());
       return null;
     }
-    return this;
   }
 
   /// Shuts down the server and stops listening to requests.
@@ -130,19 +145,9 @@ class H4 {
   }
 
   _bootstrap() {
-    // var newStream = server?.asBroadcastStream();
-
-    // newStream?.listen((HttpRequest req) {
-    //   var event = H4Event(req);
-    //   var params = router?.getParams(req.uri.path);
-    //   event.eventParams = params ?? {};
-    //   _onRequestHandler!(event);
-    // });
-
     server?.listen((HttpRequest request) {
       if (router == null) {
-        print(
-            "No router is defined, it is recommended to use createRouter() to define a router.");
+        logger.warning("No router is defined!");
       }
 
       // Find handler for that request
@@ -190,7 +195,7 @@ class H4 {
             statusCode: e.errorCode)(request);
       }
 
-      /// Catch non-explicity error when they occur and send a JSON payload to the client.
+      // Catch non-explicity error when they occur and send a JSON payload to the client.
       catch (e, trace) {
         defineErrorHandler(_errorHandler,
             params: params,
