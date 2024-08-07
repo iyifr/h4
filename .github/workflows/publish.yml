@@ -16,7 +16,6 @@ jobs:
     with:
       # Specify the github actions deployment environment
       environment: pub.dev
-    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: dart-lang/setup-dart@v1
