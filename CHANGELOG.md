@@ -138,3 +138,10 @@ Apologies for any distruptions, we are now prioritizing mature and stable develo
   - When the port assigned to server is taken, it now informs you that the port is taken and tries
     to start the server on port - (previousPort + 1).
   - Improved documentation comments for the added utilities in the last release.
+
+## 0.1.2
+
+- ### Patch Release
+  - Improved logic for re-assigning localhost port to start server on when designated port is in
+    use.
+  - Added a naive stream (SSE) implementation.

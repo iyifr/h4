@@ -19,9 +19,12 @@ class H4 {
   H4Router? router;
   Middleware _onRequestHandler;
   // ignore: prefer_function_declarations_over_variables
-  void Function(String e, String? s, H4Event? event) _errorHandler =
-      (e, s, event) => logger.severe(
-          'Stack Trace \n $e \n $s \n Error occured at path -${event?.path}');
+  void Function(
+      String e,
+      String? s,
+      H4Event?
+          event) _errorHandler = (e, s, event) => logger.severe(
+      'Error stack Trace: \n$e \n$s \nError occured at path -${event?.path}');
 
   int port;
 
@@ -50,22 +53,20 @@ class H4 {
     initLogger();
 
     if (autoStart) {
-      start();
+      start(port: port);
     }
   }
 
-  /// Initializes the server on **localhost** and starts listening for requests.
-  Future<H4?> start() async {
+  /// Initializes the server on an available localhost port and starts listening for requests.
+  Future<H4?> start({required int port}) async {
     try {
-      var portReady = await isPortAvailable(port: port);
+      bool portReady = await isPortAvailable(port: port);
 
-      if (portReady == false) {
-        logger.info(
-            'Port $port is already taken, starting server on ${port + 1}');
-        port = port + 1;
-
-        start();
+      while (portReady == false) {
+        port += 1;
+        portReady = await isPortAvailable(port: port);
       }
+
       server = await initializeHttpConnection(
         port: port,
       );
@@ -195,7 +196,7 @@ class H4 {
             statusCode: e.errorCode)(request);
       }
 
-      // Catch non-explicity error when they occur and send a JSON payload to the client.
+      // Catch not explicitly catched errors when they occur and send a JSON payload to the client.
       catch (e, trace) {
         defineErrorHandler(_errorHandler,
             params: params,

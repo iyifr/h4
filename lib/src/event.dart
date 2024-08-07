@@ -99,10 +99,22 @@ class H4Event {
       return;
     }
 
+    if (handlerResult is Stream) {
+      _request.response.persistentConnection = true;
+      handlerResult.listen((value) {
+        print(value);
+        _request.response.write('data: ${value.toString()} \n');
+      }, onDone: () {
+        print('stram finished');
+        _shutDown();
+      });
+      return;
+    }
+
     // Handle Async Handler
     if (handlerResult is Future) {
       handlerResult
-          .then((value) => resolveHandler(this, value))
+          .then((value) => resolveRequest(this, value))
           .onError((error, stackTrace) {
         statusCode = 500;
         var errResponse = {
@@ -110,57 +122,55 @@ class H4Event {
           "statusMessage": "Internal server error"
         };
         setResponseFormat("json");
-        writeToClient(jsonEncode(errResponse));
+        _writeToClient(jsonEncode(errResponse));
       });
       return;
     }
 
     // Handle non-async handler.
-    resolveHandler(this, handlerResult);
+    resolveRequest(this, handlerResult);
   }
 
-  /// Avoid using this method in handlers and middleware.
-  ///
-  /// In handlers return the value instead of writing to the client directly.
-  ///
-  /// In middleware, your functions should void and not return anything to the client.
-  /// Middleware should only run side effects.
-  void writeToClient(dynamic value) {
+  void _writeToClient(dynamic value) {
     _request.response.write(value);
-    shutDown();
+    _shutDown();
     _handled = true;
+  }
+
+  void respondWith(dynamic value) {
+    _writeToClient(value);
   }
 
   /// Will close the response `IOSink` and complete the request.
   ///
   /// Avoid calling this in handlers and middleware.
-  void shutDown() {
+  void _shutDown() {
     _request.response.close();
   }
-}
 
-resolveHandler(H4Event event, handlerResult) {
-  // ignore: type_check_with_null
-  if (handlerResult is Null) {
-    event.setResponseFormat('null');
-    event.writeToClient('No content');
-    return;
+  resolveRequest(H4Event event, handlerResult) {
+    // ignore: type_check_with_null
+    if (handlerResult is Null) {
+      event.setResponseFormat('null');
+      event._writeToClient('No content');
+      return;
+    }
+
+    if (handlerResult is Map || handlerResult is List || handlerResult is Set) {
+      event.setResponseFormat("json");
+      handlerResult = jsonEncode(handlerResult);
+      event._writeToClient(handlerResult);
+      return;
+    }
+
+    // Just in case the user is quirky.
+    if (handlerResult is DateTime) {
+      event.setResponseFormat('text');
+      event._writeToClient(handlerResult.toIso8601String());
+      return;
+    }
+
+    // Any other data type will be stringified by HttpResponse.write()
+    event._writeToClient(handlerResult);
   }
-
-  if (handlerResult is Map || handlerResult is List || handlerResult is Set) {
-    event.setResponseFormat("json");
-    handlerResult = jsonEncode(handlerResult);
-    event.writeToClient(handlerResult);
-    return;
-  }
-
-  // Just in case the user is quirky.
-  if (handlerResult is DateTime) {
-    event.setResponseFormat('text');
-    event.writeToClient(handlerResult.toIso8601String());
-    return;
-  }
-
-  // Any other data type will be stringified by HttpResponse.write()
-  event.writeToClient(handlerResult);
 }
