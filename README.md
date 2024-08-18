@@ -76,9 +76,15 @@ Specify the return type of your handlers
 router.get<bool>("/25/**", (event) => true);
 ```
 
-### Middleware
+### Global Hooks
 
-H4 provides two middleware functions out of the box.
+You can register global hooks:
+
+- `onRequest`
+- `onError`
+
+These hooks are called for every request and can be used to add global logic to your app such as
+logging, error handling, etc.
 
 ```dart
 // Invoked when a request comes in
@@ -86,9 +92,9 @@ app.onRequest((event) {
  print('Incoming request method: ${event.method}');
 });
 
-// Global error handler - Called when an error occurs in non-async handlers
+// Global error handler - Called when an error occurs.
 app.onError((error) {
- print("$error");
+ logToSentry("$error");
 });
 ```
 
@@ -98,7 +104,7 @@ You can throw a create error Exception that will terminate the request and send 
 response
 
 ```dart
-router.get('/error', (event) {
+router.get('/error', (event) async {
  try {
   // Code that could fail.
  }
@@ -113,7 +119,7 @@ The client recieves this json payload -
 ```json
 {
  "status": 400,
- "message": "[Error message]"
+ "message": "Womp Womp"
 }
 ```
 
@@ -173,18 +179,9 @@ router.post("/vamos", (event) async {
 });
 ```
 
-## Contributing
+### Contributing
 
-Contributors needed!
-
-There's quite a bit of work to do to get H4 to 1.0.0 and ready for production use.
-
-If you find a bug or have an idea for a new feature, please
-[open an issue](https://github.com/iyifr/h4/issues/new) or submit a pull request.
-
-### First Contribution
-
-A good first PR would be helping me improve the test coverage of this library. Or adding one of the
+A good first PR would be helping me improve the test coverage of this library, or adding one of the
 utilities listed [here](https://h3.unjs.io/utils).
 
 ### Running tests

@@ -70,8 +70,8 @@ class H4 {
       server = await initializeHttpConnection(
         port: port,
       );
-      logger.info('Server started on port $port');
       _bootstrap();
+      logger.info('Server started on port $port');
       return this;
     } catch (e) {
       logger.severe(e.toString());
@@ -146,9 +146,18 @@ class H4 {
   }
 
   _bootstrap() {
-    server?.listen((HttpRequest request) {
+    server!.listen((HttpRequest request) {
       if (router == null) {
-        logger.warning("No router is defined!");
+        logger.warning("Router instance is missing.");
+        defineEventHandler((event) {
+          event.statusCode = 404;
+          return {
+            "statusCode": 404,
+            "statusMessage": "Not found",
+            "message": "Cannot ${event.method.toUpperCase()} - ${event.path}"
+          };
+        }, onRequest: _onRequestHandler, params: {})(request);
+        return;
       }
 
       // Find handler for that request
@@ -165,7 +174,7 @@ class H4 {
           handler = match[request.method];
         }
 
-        // If we find no match for the request signature handle it accordingly
+        // If we find no match for the request signature - 404.
         if (handler == null || match == null) {
           defineEventHandler((event) {
             event.statusCode = 404;
@@ -177,6 +186,7 @@ class H4 {
           }, onRequest: _onRequestHandler, params: params)(request);
           return;
         }
+
         // We've found a match - handle the request.
         else {
           defineEventHandler(handler,

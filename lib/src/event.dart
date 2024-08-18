@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:core';
 import 'dart:io';
+import 'package:h4/create.dart';
 import 'package:h4/src/logger.dart';
 
 /// Represents an event in the H4 framework.
@@ -116,13 +117,7 @@ class H4Event {
       handlerResult
           .then((value) => resolveRequest(this, value))
           .onError((error, stackTrace) {
-        statusCode = 500;
-        var errResponse = {
-          "error": error.toString(),
-          "statusMessage": "Internal server error"
-        };
-        setResponseFormat("json");
-        _writeToClient(jsonEncode(errResponse));
+        throw CreateError(message: "Internal server error", errorCode: 500);
       });
       return;
     }
