@@ -29,7 +29,7 @@ void main(List<String> arguments) async {
 
   router.get<Stream<String>>('/', (event) {
     setResponseHeader(event, HttpHeaders.contentTypeHeader,
-        value: 'text/event-stream text/html');
+        value: 'text/event-stream');
 
     setResponseHeader(event, HttpHeaders.cacheControlHeader,
         value:
@@ -47,24 +47,17 @@ void main(List<String> arguments) async {
     return countStream(8);
   });
 
-  router.get("/hi/:id", (event) {
-    throw Exception('Yo');
-    // return 'Hey ${event.params["id"]}';
-  });
-
-  router.post("/vamos", (event) async {
+  router.post("/vamos/:id/**", (event) async {
     var body = await readRequestBody(event);
     var header = getHeader(event, HttpHeaders.userAgentHeader);
     var query = getQueryParams(event);
     setResponseHeader(event, HttpHeaders.contentTypeHeader,
         value: 'application/json');
-    return [header, body, query];
+    return [header, body, query, event.params];
   });
 
-  router.get<Future<int>>('/int', (event) async {
-    await Future.delayed(Duration(seconds: 4));
-    var res = await Future.value(23994);
-    return res;
+  router.get<Future<dynamic>>('/int', (event) async {
+    return Future.error(Exception('Hula ballo'));
   });
 
   router.get("/vamos", (event) {

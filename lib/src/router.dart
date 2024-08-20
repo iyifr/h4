@@ -50,11 +50,12 @@ class H4Router {
   /// - A normalized request method string [GET, POST, PUT, DELETE, PATCH]
   Map<String, EventHandler?>? lookup(path) {
     var pathChunks = extractPieces(path);
+
     var result = routes.search(pathChunks);
 
     result ??= routes.matchParamRoute(pathChunks);
 
-    result ??= routes.matchWildCardRoute(extractPieces(path));
+    result ??= routes.matchWildCardRoute(pathChunks);
 
     return result;
   }

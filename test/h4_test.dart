@@ -83,4 +83,39 @@ void main() {
     final response = await dio.get('/async');
     expect(response.data, '6700');
   });
+
+  test('Handles single dynamic routes', () async {
+    router.get('/user/:id', (event) => event.params['id']);
+
+    final response = await dio.get('/user/xyz_abc_123');
+    expect(response.data, 'xyz_abc_123');
+  });
+
+  test('Handles match-all wildcard routes', () async {
+    router.get('/user/**', (event) => "Welcome to H4!");
+
+    final req1 = dio.get('/user/fun');
+    final req2 = dio.get('/user/fun/me');
+    final req3 = dio.get('/user/fun/me/you');
+
+    final responses = await Future.wait([req1, req2, req3]);
+
+    for (final response in responses) {
+      expect(response.data, "Welcome to H4!");
+    }
+  });
+
+  test('Handles paramaterized match-all requests', () async {
+    router.get('/donut/:id/**', (event) => "Welcome to H4!");
+
+    final req1 = dio.get('/donut/user/fun');
+    final req2 = dio.get('/donut/user/fun/me');
+    final req3 = dio.get('/donut/user/fun/me/you');
+
+    final responses = await Future.wait([req1, req2, req3]);
+
+    for (final response in responses) {
+      expect(response.data, "Welcome to H4!");
+    }
+  });
 }

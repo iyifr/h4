@@ -72,13 +72,15 @@ class Trie {
     TrieNode? currNode = root;
 
     for (String pathPiece in pathPieces) {
+      int index = pathPieces.indexOf(pathPiece);
       if (currNode?.children[pathPiece] == null) {
         currNode?.children.forEach((key, value) {
-          if ((key.startsWith(":") || key.startsWith("*")) &&
-              value.handlers.isNotEmpty) {
+          if ((key.startsWith(":") || key.startsWith("*")) && value.isLeaf) {
             // Do not behave like a wildcard. Only match if the param route is an exact match.
             if (pathPieces.lastOrNull == pathPiece) {
-              laHandler = value.handlers;
+              if (index == pathPieces.length - 1) {
+                laHandler = value.handlers;
+              }
             } else {
               // Handle weird edge case where a handler with id as a leaf is defined in route trie
               var result = deepTraverse(value.children);
@@ -141,6 +143,9 @@ class Trie {
         currNode?.children.forEach((key, value) {
           if (key.startsWith("**") && value.isLeaf) {
             laHandler = value.handlers;
+          } else {
+            var result = deepTraverse(value.children);
+            laHandler = result["handlers"];
           }
         });
       }

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:core';
 import 'dart:io';
@@ -95,20 +96,26 @@ class H4Event {
   ///
   /// If the [handlerResult] is `null`, the response will be closed without writing any content.
   /// The [handled] flag is set to `true` after the response is sent.
-  void respond(dynamic handlerResult) {
+  void respond(dynamic handlerResult) async {
     if (_handled) {
       return;
     }
 
     if (handlerResult is Stream) {
       _request.response.persistentConnection = true;
+
+      final controller = StreamController<dynamic>.broadcast();
+
       handlerResult.listen((value) {
-        print(value);
         _request.response.write('data: ${value.toString()} \n');
+        _request.response.flush();
       }, onDone: () {
-        print('stram finished');
+        _request.response.write('data: [DONE]\n');
         _shutDown();
+        controller.close();
       });
+
+      await controller.stream.drain();
       return;
     }
 
