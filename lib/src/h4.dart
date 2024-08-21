@@ -38,7 +38,6 @@ typedef MiddlewareStack = Map<String, Either<Middleware?, ErrorHandler?>?>?;
 class H4 {
   HttpServer? server;
   H4Router? router;
-  Middleware _onReq;
   late MiddlewareStack middlewares;
 
   // ignore: prefer_function_declarations_over_variables
@@ -143,7 +142,7 @@ class H4 {
   /// ```
   @Deprecated('Set the middlewares in the create app constructor instead')
   void onRequest(Middleware func) {
-    _onReq = func;
+    return;
   }
 
   /// Registers an error handling function to be executed when an error occurs.
