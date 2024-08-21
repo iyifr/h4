@@ -1,6 +1,8 @@
 import 'dart:io';
 
-/// Custom HTTP exception class for creating and throwing errors.
+/// Handles a specific type of error, `CreateError` when it is thrown explicitly in a catch block
+///
+/// It returns a function that is invoked with the incoming request which sends a JSON payload to the client with the error details.
 class CreateError implements HttpException {
   /// Message to send to the client.
   @override

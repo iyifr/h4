@@ -44,13 +44,15 @@ Function(HttpRequest) defineErrorHandler(ErrorHandler handler,
     var event = H4Event(request);
     event.eventParams = params;
 
-    // Call the void event handler.
+    // Call the error middleware.
     handler(error, trace.toString(), event);
 
     event.statusCode = statusCode;
+
     setResponseHeader(event, HttpHeaders.contentTypeHeader,
         value: 'application/json');
     var response = {"statusCode": statusCode, "message": error.toString()};
+
     event.respondWith(jsonEncode(response));
   };
 }

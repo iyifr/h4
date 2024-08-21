@@ -1,6 +1,7 @@
 import 'dart:core';
 import 'dart:io';
 import 'package:h4/src/event.dart';
+import 'package:h4/src/h4.dart';
 
 /// A function that takes the following parameters
 /// - A [EventHandler] event handler,
@@ -11,27 +12,27 @@ import 'package:h4/src/event.dart';
 ///
 /// It should always close the request with the appropriate status code and message.
 Function(HttpRequest) defineEventHandler(
-  EventHandler<dynamic> handler, {
+  EventHandler<dynamic> handler,
+  MiddlewareStack? middlewares,
+  Map<String, String>? params, {
   void Function(H4Event)? onRequest,
-  Map<String, String>? params,
 }) {
   return (HttpRequest request) {
-    request.response.headers.contentType = null;
-    // Create an event with the incoming request.
     var event = H4Event(request);
 
     /// Sets the event params so it accessible in the handler.
     event.eventParams = params ?? {};
 
     // If onRequest is defined, call it with the event.
-
-    if (onRequest != null) {
-      onRequest(event);
+    if (middlewares?['onRequest'] != null) {
+      if (middlewares?['onRequest']?.left != null) {
+        middlewares?['onRequest']?.left!(event);
+      }
     }
 
     // Call the handler with the event.
     var handlerResult = handler(event);
-    event.respond(handlerResult);
+    event.respond(handlerResult, middlewares: middlewares);
   };
 }
 

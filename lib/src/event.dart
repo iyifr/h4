@@ -1,9 +1,9 @@
-import 'dart:async';
 import 'dart:convert';
 import 'dart:core';
 import 'dart:io';
-import 'package:h4/create.dart';
+import 'package:h4/src/h4.dart';
 import 'package:h4/src/logger.dart';
+import 'package:h4/utils/set_response_header.dart';
 
 /// Represents an event in the H4 framework.
 ///
@@ -39,8 +39,35 @@ class H4Event {
     this.params = params;
   }
 
-  /// The status message associated with the HTTP response status code.
+  /// Gets or sets the reason phrase for the HTTP response.
+  ///
+  /// This property allows you to read or modify the reason phrase
+  /// associated with the HTTP status code of the response.
+  ///
+  /// The reason phrase must not contain newline characters and
+  /// should not exceed 512 characters in length.
+  ///
+  /// Example:
+  /// ```dart
+  /// // Get the current status message
+  /// print(response.statusMessage);
+  ///
+  /// // Set a custom status message
+  /// response.statusMessage = 'Custom Reason';
+  /// ```
+  ///
+  /// Throws an [ArgumentError] if the provided value is invalid.
   String get statusMessage => _request.response.reasonPhrase;
+
+  set statusMessage(String value) {
+    if (value.contains('\n')) {
+      throw ArgumentError('Reason phrase cannot contain newline characters');
+    }
+    if (value.length > 512) {
+      throw ArgumentError('Reason phrase cannot exceed 512 characters');
+    }
+    _request.response.reasonPhrase = value;
+  }
 
   /// A way to access the request triggering the event.
   ///
@@ -96,41 +123,36 @@ class H4Event {
   ///
   /// If the [handlerResult] is `null`, the response will be closed without writing any content.
   /// The [handled] flag is set to `true` after the response is sent.
-  void respond(dynamic handlerResult) async {
+  void respond(dynamic handlerResult, {required MiddlewareStack middlewares}) {
     if (_handled) {
-      return;
-    }
-
-    if (handlerResult is Stream) {
-      _request.response.persistentConnection = true;
-
-      final controller = StreamController<dynamic>.broadcast();
-
-      handlerResult.listen((value) {
-        _request.response.write('data: ${value.toString()} \n');
-        _request.response.flush();
-      }, onDone: () {
-        _request.response.write('data: [DONE]\n');
-        _shutDown();
-        controller.close();
-      });
-
-      await controller.stream.drain();
       return;
     }
 
     // Handle Async Handler
     if (handlerResult is Future) {
       handlerResult
-          .then((value) => resolveRequest(this, value))
+          .then((value) => _resolveRequest(this, value))
           .onError((error, stackTrace) {
-        throw CreateError(message: "Internal server error", errorCode: 500);
+        // Call error middleware
+        if (middlewares != null && middlewares['onError'] != null) {
+          middlewares['onError']!.right!(
+            '$error',
+            '$stackTrace',
+            this,
+          );
+        }
+
+        setResponseHeader(this, HttpHeaders.contentTypeHeader,
+            value: 'application/json');
+        var response = {"statusCode": 500, "message": error.toString()};
+
+        respondWith(jsonEncode(response));
       });
       return;
     }
 
     // Handle non-async handler.
-    resolveRequest(this, handlerResult);
+    _resolveRequest(this, handlerResult);
   }
 
   void _writeToClient(dynamic value) {
@@ -150,9 +172,10 @@ class H4Event {
     _request.response.close();
   }
 
-  resolveRequest(H4Event event, handlerResult) {
+  _resolveRequest(H4Event event, handlerResult) {
     // ignore: type_check_with_null
     if (handlerResult is Null) {
+      event.statusCode = 204;
       event.setResponseFormat('null');
       event._writeToClient('No content');
       return;

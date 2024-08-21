@@ -1,51 +1,24 @@
 // import 'package:console/console.dart' as console;
 
 import 'dart:io';
+import 'dart:math';
 
 import 'package:h4/create.dart';
+import 'package:h4/src/logger.dart';
 import 'package:h4/utils/get_header.dart';
 import 'package:h4/utils/get_query.dart';
 import 'package:h4/utils/read_request_body.dart';
 import 'package:h4/utils/set_response_header.dart';
 
-Stream<String> countStream(int max) async* {
-  for (int i = 1; i <= max; i++) {
-    // Yield each value asynchronously
-    await Future.delayed(Duration(seconds: 3));
-    yield '<li>hi $i</li>';
-  }
-}
-
 void main(List<String> arguments) async {
-  var app = createApp(port: 5173);
-
   var router = createRouter();
 
+  var app = createApp(
+    port: 5173,
+    onRequest: (event) => logger.info('$event'),
+  );
+
   app.use(router);
-
-  // router.get<bool>('/', (event) {
-  //   return true;
-  // });
-
-  router.get<Stream<String>>('/', (event) {
-    setResponseHeader(event, HttpHeaders.contentTypeHeader,
-        value: 'text/event-stream');
-
-    setResponseHeader(event, HttpHeaders.cacheControlHeader,
-        value:
-            "private, no-cache, no-store, no-transform, must-revalidate, max-age=0");
-
-    setResponseHeader(event, HttpHeaders.transferEncodingHeader,
-        value: 'chunked');
-
-    setResponseHeader(event, "x-accel-buffering", value: "no");
-
-    setResponseHeader(event, 'connection', value: 'keep-alive');
-
-    print(event.node["value"]?.response.headers);
-
-    return countStream(8);
-  });
 
   router.post("/vamos/:id/**", (event) async {
     var body = await readRequestBody(event);
@@ -57,7 +30,24 @@ void main(List<String> arguments) async {
   });
 
   router.get<Future<dynamic>>('/int', (event) async {
-    return Future.error(Exception('Hula ballo'));
+    try {
+      Future<String> unreliableFunction() async {
+        // Simulate some async operation
+        await Future.delayed(Duration(seconds: 1));
+
+        // Randomly succeed or fail
+        if (Random().nextBool()) {
+          return "Operation succeeded";
+        } else {
+          throw Exception("Random failure occurred");
+        }
+      }
+
+      String result = await unreliableFunction();
+      return result;
+    } catch (e) {
+      throw CreateError(message: "Error: $e");
+    }
   });
 
   router.get("/vamos", (event) {

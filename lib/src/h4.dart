@@ -4,27 +4,50 @@ import 'package:h4/src/error_middleware.dart';
 import 'package:h4/src/logger.dart';
 import 'package:h4/src/port_taken.dart';
 import 'package:h4/src/router.dart';
+import 'package:h4/utils/set_response_header.dart';
 
 import '/src/index.dart';
 import 'initialize_connection.dart';
 import 'event.dart';
 
+class Either<T, U> {
+  final T? left;
+  final U? right;
+
+  Either.left(this.left) : right = null;
+  Either.right(this.right) : left = null;
+}
+
 /// A middleware function that takes an [H4Event] and has access to it's snapshot.
 typedef Middleware = void Function(H4Event event)?;
 
+/// The [ErrorHandler] is used to process and potentially report errors that occur
+/// during the execution of the application.
+///
+/// Parameters:
+/// - [String] errorMessage: A description of the error that occurred.
+/// - [String?] stackTrace: The stack trace associated with the error, if available.
+///   This parameter is optional and may be null.
+/// - [H4Event?] event: An optional event object that provides additional context
+///   about when or where the error occurred. This parameter is optional and may be null.
+///
 typedef ErrorHandler = void Function(String, String?, H4Event?);
+
+typedef MiddlewareStack = Map<String, Either<Middleware?, ErrorHandler?>?>?;
 
 class H4 {
   HttpServer? server;
   H4Router? router;
-  Middleware _onRequestHandler;
+  Middleware _onReq;
+  late MiddlewareStack middlewares;
+
   // ignore: prefer_function_declarations_over_variables
   void Function(
-      String e,
-      String? s,
+      String error,
+      String? stackTrace,
       H4Event?
-          event) _errorHandler = (e, s, event) => logger.severe(
-      'Error stack Trace: \n$e \n$s \nError occured at path -${event?.path}');
+          event) _errorHandler = (error, stackTrace, event) => logger.severe(
+      '$error\n $stackTrace Error occured while attempting ${event?.method.toUpperCase()} request at - ${event?.path}');
 
   int port;
 
@@ -49,7 +72,11 @@ class H4 {
   /// // Start the application on the default port (3000)
   /// final app = H4();
   /// ```
-  H4({this.port = 3000, bool autoStart = true}) {
+  H4({
+    this.port = 3000,
+    bool autoStart = true,
+    this.middlewares,
+  }) {
     initLogger();
 
     if (autoStart) {
@@ -109,13 +136,14 @@ class H4 {
   /// h4.onRequest((H4Event event) {
   ///   // Log the request details
   ///   logRequestDetails(event);
-  ///
   ///   // Validate the request data
   ///   validateRequestData(event);
   /// });
+  /// @deprecated
   /// ```
+  @Deprecated('Set the middlewares in the create app constructor instead')
   void onRequest(Middleware func) {
-    _onRequestHandler = func;
+    _onReq = func;
   }
 
   /// Registers an error handling function to be executed when an error occurs.
@@ -149,14 +177,7 @@ class H4 {
     server!.listen((HttpRequest request) {
       if (router == null) {
         logger.warning("Router instance is missing.");
-        defineEventHandler((event) {
-          event.statusCode = 404;
-          return {
-            "statusCode": 404,
-            "statusMessage": "Not found",
-            "message": "Cannot ${event.method.toUpperCase()} - ${event.path}"
-          };
-        }, onRequest: _onRequestHandler, params: {})(request);
+        return404(request)(middlewares, null);
         return;
       }
 
@@ -176,29 +197,14 @@ class H4 {
 
         // If we find no match for the request signature - 404.
         if (handler == null || match == null) {
-          defineEventHandler((event) {
-            event.statusCode = 404;
-            return {
-              "statusCode": 404,
-              "statusMessage": "Not found",
-              "message": "Cannot ${event.method.toUpperCase()} - ${event.path}"
-            };
-          }, onRequest: _onRequestHandler, params: params)(request);
-          return;
+          return404(request)(middlewares, null);
         }
 
         // We've found a match - handle the request.
         else {
-          defineEventHandler(handler,
-              onRequest: _onRequestHandler, params: params)(request);
-          return;
+          defineEventHandler(handler, middlewares, params)(request);
         }
-      }
-
-      /// Handles a specific type of error, `CreateError` when it is thrown explicitly in a catch block
-      ///
-      /// It returns a function that is invoked with the incoming request which sends a JSON payload to the client with the error details.
-      on CreateError catch (e, trace) {
+      } on CreateError catch (e, trace) {
         defineErrorHandler(_errorHandler,
             params: params,
             error: e.message,
@@ -216,4 +222,26 @@ class H4 {
       }
     });
   }
+}
+
+typedef NotFoundHandler = dynamic Function(
+    MiddlewareStack stack, Map<String, String>? params);
+
+NotFoundHandler return404(HttpRequest request) {
+  return (stack, params) {
+    return defineEventHandler(
+      (event) {
+        event.statusCode = 404;
+        setResponseHeader(event, HttpHeaders.contentTypeHeader,
+            value: 'application/json');
+        return {
+          "statusCode": 404,
+          "statusMessage": "Not found",
+          "message": "Cannot ${event.method.toUpperCase()} - ${event.path}"
+        };
+      },
+      stack,
+      params,
+    )(request);
+  };
 }
