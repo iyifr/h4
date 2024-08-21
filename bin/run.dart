@@ -15,7 +15,6 @@ void main(List<String> arguments) async {
 
   var app = createApp(
     port: 5173,
-    onRequest: (event) => logger.info('$event'),
   );
 
   app.use(router);
@@ -46,7 +45,7 @@ void main(List<String> arguments) async {
       String result = await unreliableFunction();
       return result;
     } catch (e) {
-      throw CreateError(message: "Error: $e");
+      throw CreateError(message: "Error occurred while proccessing: $e");
     }
   });
 

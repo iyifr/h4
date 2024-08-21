@@ -17,10 +17,10 @@ class CreateError implements HttpException {
   ///
   /// Parameters:
   /// - `message`: The error message to be sent to the client.
-  /// - `errorCode`: The HTTP status code for the error (defaults to 400 if not provided).
+  /// - `errorCode`: The HTTP status code for the error (defaults to 500 if not provided).
   CreateError({
     required this.message,
-    this.errorCode = 400,
+    this.errorCode = 500,
   });
 
   @override
@@ -28,6 +28,6 @@ class CreateError implements HttpException {
 
   @override
   String toString() {
-    return '$errorCode - $message';
+    return message;
   }
 }

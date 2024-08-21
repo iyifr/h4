@@ -51,7 +51,11 @@ Function(HttpRequest) defineErrorHandler(ErrorHandler handler,
 
     setResponseHeader(event, HttpHeaders.contentTypeHeader,
         value: 'application/json');
-    var response = {"statusCode": statusCode, "message": error.toString()};
+    var response = {
+      "statusCode": statusCode,
+      "statusMessage": "Internal server error",
+      "message": error.toString()
+    };
 
     event.respondWith(jsonEncode(response));
   };
