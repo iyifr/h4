@@ -131,6 +131,12 @@ class H4Event {
 
     // Handle non-async handler.
     _resolveRequest(this, handlerResult);
+
+    if (middlewares?['afterResponse'] != null) {
+      if (middlewares?['afterResponse']?.left != null) {
+        middlewares?['afterResponse']?.left!(this);
+      }
+    }
   }
 
   void _writeToClient(dynamic value) {

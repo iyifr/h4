@@ -1,3 +1,22 @@
+## 0.1.3
+
+- ### Patch Release
+  - Deprecated app.onRequest() signature for registering middleware.
+  - Added new signature for adding middleware to requests.
+  ```dart
+  var app = createApp(
+    port: 5173,
+    onRequest: (event) => {},
+    onError: (error, stacktrace, event) => {},
+    afterResponse: (event) => {},
+  );
+  var router = createRouter();
+  app.use(router);
+  ```
+  - Error handling in async handlers has been refactored and improved.
+  - Certain edge cases with wildcard routing patterns were addressed.
+  - Stream (SSE) implementation removed for now to study StreamSinks.
+
 ## 0.1.2
 
 - ### Patch Release

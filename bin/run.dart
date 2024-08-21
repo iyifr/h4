@@ -4,19 +4,22 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:h4/create.dart';
-import 'package:h4/src/logger.dart';
 import 'package:h4/utils/get_header.dart';
 import 'package:h4/utils/get_query.dart';
 import 'package:h4/utils/read_request_body.dart';
 import 'package:h4/utils/set_response_header.dart';
 
 void main(List<String> arguments) async {
-  var router = createRouter();
+  
 
   var app = createApp(
     port: 5173,
+    onRequest: (event) => {},
+    onError: (error, stacktrace, event) => {},
+    afterResponse: (event) => {},
   );
 
+  var router = createRouter();
   app.use(router);
 
   router.post("/vamos/:id/**", (event) async {
