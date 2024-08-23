@@ -1,4 +1,3 @@
-import 'package:console/console.dart' as console;
 import 'package:h4/create.dart';
 
 void main() async {

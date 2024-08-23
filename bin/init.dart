@@ -129,6 +129,7 @@ Future<String?> _promptUserChoice() async {
       }
     }
   }
+  return null;
 }
 
 Future<String> _promptAppName() async {
