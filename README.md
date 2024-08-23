@@ -87,15 +87,14 @@ These hooks are called for every request and can be used to add global logic to 
 logging, error handling, etc.
 
 ```dart
-// Invoked when a request comes in
-app.onRequest((event) {
- print('Incoming request method: ${event.method}');
-});
-
-// Global error handler - Called when an error occurs.
-app.onError((error) {
- logToSentry("$error");
-});
+ var app = createApp(
+   port: 5173,
+   onRequest: (event) => {},
+   onError: (error, stacktrace, event) => {},
+   afterResponse: (event) => {},
+ );
+ var router = createRouter();
+ app.use(router);
 ```
 
 ### Error Handling
@@ -118,8 +117,8 @@ The client recieves this json payload -
 
 ```json
 {
- "status": 400,
- "message": "Womp Womp"
+	"status": 400,
+	"message": "Womp Womp"
 }
 ```
 

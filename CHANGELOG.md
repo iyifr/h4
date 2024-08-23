@@ -1,3 +1,15 @@
+## 0.1.4
+
+- #### Release
+  - Added a basic CLI that bootstraps a H4 app in bin/init.
+    - The H4 init command bootstraps a full H4 app.
+    ```powershell
+    dart pub global activate markdown
+    ```
+    ```powershell
+    h4 init
+    ```
+
 ## 0.1.3
 
 - ### Patch Release

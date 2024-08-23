@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'package:compute/compute.dart';
 import 'package:either_dart/either.dart';
 import 'package:h4/src/event.dart';
 import 'package:h4/src/logger.dart';
@@ -62,7 +61,8 @@ FutureOr<Either<Map, List>?> parseJsonString(String jsonString) async {
     return Left({});
   }
 
-  final parsed = await compute(jsonDecode, jsonString);
+  final parsed = await jsonDecode(jsonString);
+
   if (parsed is Map) {
     return Left(parsed);
   } else if (parsed is List) {
