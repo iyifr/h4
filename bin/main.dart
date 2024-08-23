@@ -22,4 +22,8 @@ void main() async {
   router.get("/hi", (event) {
     throw CreateError(message: "HAHA");
   });
+
+  router.get('#', (event) {
+    return 'Hi';
+  });
 }
