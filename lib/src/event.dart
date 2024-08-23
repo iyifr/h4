@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:h4/src/error_middleware.dart';
 import 'package:h4/src/h4.dart';
 import 'package:h4/src/logger.dart';
-import 'package:h4/utils/set_response_header.dart';
 
 /// Represents an event in the H4 framework.
 ///
