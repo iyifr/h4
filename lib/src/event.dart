@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:core';
 import 'dart:io';
+import 'package:h4/src/error_middleware.dart';
 import 'package:h4/src/h4.dart';
 import 'package:h4/src/logger.dart';
 import 'package:h4/utils/set_response_header.dart';
@@ -23,7 +24,13 @@ class H4Event {
 
   H4Event(this._request)
       : params = {},
-        context = {};
+        context = {
+          'path': _request.uri.path,
+          'query_params': _request.uri.queryParameters,
+          'method': _request.method,
+          'protocol': _request.protocolVersion,
+          'path_segments': _request.uri.pathSegments
+        };
 
   String get path => _request.uri.path;
 
@@ -103,28 +110,11 @@ class H4Event {
       handlerResult
           .then((value) => _resolveRequest(this, value))
           .onError((error, stackTrace) {
-        // Call error middleware
-        if (middlewares != null && middlewares['onError'] != null) {
-          middlewares['onError']?.right != null
-              ? (
-                  '$error',
-                  '$stackTrace',
-                  this,
-                )
-              : null;
-        }
-
-        statusCode = 500;
-
-        setResponseHeader(this, HttpHeaders.contentTypeHeader,
-            value: 'application/json');
-        var response = {
-          "statusCode": 500,
-          "statusMessage": "Internal server error",
-          "message": error.toString()
-        };
-
-        respondWith(jsonEncode(response));
+        defineErrorHandler(
+            middlewares?['onError']?.right ?? defaultErrorMiddleware,
+            params: params,
+            error: error.toString(),
+            trace: stackTrace)(_request);
       });
       return;
     }

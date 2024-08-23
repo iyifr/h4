@@ -18,6 +18,10 @@ class Either<T, U> {
   Either.right(this.right) : left = null;
 }
 
+void Function(String error, String? stackTrace, H4Event? event)
+    defaultErrorMiddleware = (error, stackTrace, event) => logger.severe(
+        '$error\n $stackTrace Error occured while attempting ${event?.method.toUpperCase()} request at - ${event?.path}');
+
 /// A middleware function that takes an [H4Event] and has access to it's snapshot.
 typedef Middleware = void Function(H4Event event)?;
 
@@ -41,12 +45,6 @@ class H4 {
   late MiddlewareStack middlewares;
 
   // ignore: prefer_function_declarations_over_variables
-  void Function(
-      String error,
-      String? stackTrace,
-      H4Event?
-          event) _errorHandler = (error, stackTrace, event) => logger.severe(
-      '$error\n $stackTrace Error occured while attempting ${event?.method.toUpperCase()} request at - ${event?.path}');
 
   int port;
 
@@ -165,11 +163,12 @@ class H4 {
   ///   logErrorToService(error, stackTrace, event);
   /// });
   /// ```
+  @Deprecated('Set your middelwares in the app init function instead')
   void onError(
     void Function(String error, String? stackTrace, H4Event? event)
         errorHandler,
   ) {
-    _errorHandler = errorHandler;
+    null;
   }
 
   _bootstrap() {
@@ -203,17 +202,22 @@ class H4 {
         else {
           defineEventHandler(handler, middlewares, params)(request);
         }
-      } on CreateError catch (e, trace) {
-        defineErrorHandler(_errorHandler,
+      }
+
+      // Catch `createError` exception.
+      on CreateError catch (e, trace) {
+        defineErrorHandler(
+            middlewares?['onError']?.right ?? defaultErrorMiddleware,
             params: params,
             error: e.message,
             trace: trace,
             statusCode: e.errorCode)(request);
       }
 
-      // Catch not explicitly catched errors when they occur and send a JSON payload to the client.
+      // Catch `throw` type exceptions
       catch (e, trace) {
-        defineErrorHandler(_errorHandler,
+        defineErrorHandler(
+            middlewares?['onError']?.right ?? defaultErrorMiddleware,
             params: params,
             error: e.toString(),
             trace: trace,

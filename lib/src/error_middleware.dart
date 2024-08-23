@@ -39,7 +39,7 @@ Function(HttpRequest) defineErrorHandler(ErrorHandler handler,
     {required Map<String, String> params,
     required String error,
     required StackTrace trace,
-    int statusCode = 400}) {
+    int statusCode = 500}) {
   return (HttpRequest request) {
     var event = H4Event(request);
     event.eventParams = params;

@@ -10,12 +10,9 @@ import 'package:h4/utils/read_request_body.dart';
 import 'package:h4/utils/set_response_header.dart';
 
 void main(List<String> arguments) async {
-  
-
   var app = createApp(
     port: 5173,
     onRequest: (event) => {},
-    onError: (error, stacktrace, event) => {},
     afterResponse: (event) => {},
   );
 
@@ -31,24 +28,25 @@ void main(List<String> arguments) async {
     return [header, body, query, event.params];
   });
 
+  Future<String> unreliableFunction() async {
+    // Simulate some async operation
+    await Future.delayed(Duration(seconds: 1));
+
+    // Randomly succeed or fail
+    if (Random().nextBool()) {
+      return "Operation succeeded";
+    } else {
+      throw Exception("Random failure occurred");
+    }
+  }
+
   router.get<Future<dynamic>>('/int', (event) async {
     try {
-      Future<String> unreliableFunction() async {
-        // Simulate some async operation
-        await Future.delayed(Duration(seconds: 1));
-
-        // Randomly succeed or fail
-        if (Random().nextBool()) {
-          return "Operation succeeded";
-        } else {
-          throw Exception("Random failure occurred");
-        }
-      }
-
       String result = await unreliableFunction();
       return result;
     } catch (e) {
-      throw CreateError(message: "Error occurred while proccessing: $e");
+      throw CreateError(
+          message: "Error occurred while proccessing: $e", errorCode: 500);
     }
   });
 
