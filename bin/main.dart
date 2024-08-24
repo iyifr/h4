@@ -15,7 +15,7 @@ void main() async {
 
   app.use(router);
 
-  router.get("/", (event) {
+  router.get<String>("/", (event) {
     return 'Hello world';
   });
 
