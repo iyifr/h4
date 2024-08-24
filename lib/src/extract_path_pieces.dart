@@ -14,10 +14,12 @@ bool isValidHttpPathPattern(String pattern) {
     r'/'
     r'|/(?:[\p{L}\p{N}_-]+(?:/[\p{L}\p{N}_-]+)*/?)'
     r'|/(?:[\p{L}\p{N}_-]+(?:/[\p{L}\p{N}_-]+)*/)*:(?:[\p{L}\p{N}_]+)(?:/|$)'
+    r'|/[\p{L}\p{N}_-]+/:[^/]+/\*\*'
+    r'|/[\p{L}\p{N}_-]+/\*\*'
+    r'|/[\p{L}\p{N}_-]+/\*'
     r'|\*'
     r')$',
     unicode: true,
   );
-
   return regex.hasMatch(pattern);
 }
