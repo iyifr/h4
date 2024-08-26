@@ -12,7 +12,7 @@ initLogger() {
           Console.setBackgroundColor(6, bright: true);
           Console.setTextColor(2, bright: true);
           // ignore: unnecessary_string_escapes
-          Console.write('\n ${record.level.name} ');
+          Console.write(' ${record.level.name} ');
           Console.resetBackgroundColor();
           Console.resetTextColor();
           Console.setBold(false);

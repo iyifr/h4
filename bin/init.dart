@@ -11,14 +11,14 @@ void main(List<String> arguments) async {
     final choice = await _promptUserChoice();
     if (choice == 'create_in_current') {
       await _initH4InCurrentDirectory();
-      _printTechnoFuturisticAsciiArt();
+      printArt();
     } else {
       final appName = await _promptAppName();
       await _createAppFiles(appName);
-      _printTechnoFuturisticAsciiArt();
+      printArt();
     }
   } else {
-    _printTechnoFuturisticAsciiArt();
+    printArt();
     await _writeMainFile(File('bin/main.dart'));
   }
   Console.resetAll();
@@ -175,11 +175,9 @@ void _printH4AsciiArt() {
     |_| |_|       ||
 
 ''');
-
-  Console.resetAll();
 }
 
-void _printTechnoFuturisticAsciiArt() {
+void printArt() {
   Console.setTextColor(4, bright: true);
   Console.write('''
 
@@ -198,7 +196,6 @@ void _printTechnoFuturisticAsciiArt() {
      ╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱╱
 
 ''');
-  Console.resetAll();
 }
 
 Future<ProcessResult> runProcessInDirectory(

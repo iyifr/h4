@@ -4,11 +4,10 @@ void main() async {
   var app = createApp(
     port: 5173,
     onRequest: (event) {
-      // PER Request local state
-      event.context["user"] = 'Baba o ';
-      print((event.context));
+      // PER REQUEST local state😻
+      event.context["user"] = 'Ogunlepon';
     },
-    afterResponse: (event) => {print('handled')},
+    afterResponse: (event) => {},
   );
 
   var router = createRouter();
@@ -16,10 +15,8 @@ void main() async {
   app.use(router);
 
   router.get<String>("/", (event) {
+    // Still 'Ogunlepon'
+    print(event.context["user"]);
     return 'Hello world';
-  });
-
-  router.get("/hi", (event) {
-    throw CreateError(message: "HAHA");
   });
 }
