@@ -126,7 +126,11 @@ void main() {
       return body;
     });
 
-    final req = await dio.post('/body', data: [0, 1, 2]);
-    expect(req.data, '[0, 1, 2]');
+    final req = await dio.post('/body',
+        data: {"hi": 12},
+        options: Options(
+          headers: {'content-type': 'application/json'},
+        ));
+    expect(req.data, '{"hi":12}');
   });
 }

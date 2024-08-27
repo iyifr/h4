@@ -4,6 +4,7 @@ import 'dart:async';
 import 'dart:io';
 import 'package:console/console.dart';
 import 'dart:convert';
+import 'package:path/path.dart' as path;
 
 void main(List<String> arguments) async {
   if (!await _isH4Installed()) {
@@ -41,7 +42,7 @@ Future<void> _initH4InCurrentDirectory() async {
     Console.setBackgroundColor(0);
     Console.setTextColor(6);
     Console.write('\nH4 installed successfully'.toUpperCase());
-    await _writeMainFile(File('bin/main.dart'));
+    await _writeMainFile(File('lib/index.dart'));
   } catch (e) {
     Console.write('\nFailed to install the \'h4\' package. Error: $e');
     return;
@@ -68,20 +69,24 @@ Future<void> _createAppFiles(String appName,
     Console.setBlink(true);
     Console.setBold(true);
     Console.write('\n\nInstalling necessary dependencies...\n'.toUpperCase());
-    dynamic mainFile;
+    File mainFile;
+    File defaultFile =
+        File('lib/${path.basename(Directory.current.path)}.dart');
 
     if (inCurrentDir) {
       Process.runSync('dart', ['pub', 'add', 'h4'],
           workingDirectory: Directory.current.path);
-      mainFile = File('bin/main.dart');
+      mainFile = File('lib/index.dart');
     } else {
-      mainFile = File('$appName/bin/main.dart');
+      mainFile = File('$appName/lib/index.dart');
+      defaultFile = File('$appName/lib/$appName.dart');
       await runProcessInDirectory(appName, ['dart', 'pub', 'add', 'h4']);
     }
 
     Console.setBlink(false);
     Console.setBold(false);
     await _writeMainFile(mainFile);
+    await defaultFile.delete();
     Console.setBold(true);
     Console.write('\nH4 initialized successfully'.toUpperCase());
   } catch (e) {

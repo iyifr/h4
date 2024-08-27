@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'package:either_dart/either.dart';
 import 'package:h4/src/event.dart';
+import 'package:h4/src/h4.dart';
 import 'package:h4/src/logger.dart';
 
 /// Read the body of the incoming event request.
@@ -44,31 +44,33 @@ Future<dynamic> parseRequestBody(HttpRequest request,
   }
 }
 
-variableReturnType<T, R>(Either<T, R>? value) {
-  return value?.fold((left) => left, (right) => right);
-}
+// variableReturnType<T, R>(Either<T, R>? value) {
+//   return value?.fold((left) => left, (right) => right);
+// }
 
 parseBodyAsJson({required List<int> bytes}) async {
-  var bodyAsDartCollection = await parseJsonString(utf8.decode(bytes));
+  var body = await parseJsonString(utf8.decode(bytes));
 
-  // Returns the request body as a dart collection.
-  return variableReturnType<Map<dynamic, dynamic>, List<dynamic>>(
-      bodyAsDartCollection);
+  if (body?.left == null) {
+    return body?.right;
+  } else {
+    return body?.left;
+  }
 }
 
-FutureOr<Either<Map, List>?> parseJsonString(String jsonString) async {
+FutureOr<Either<Map?, List?>?> parseJsonString(String jsonString) async {
   if (jsonString.isEmpty) {
-    return Left({});
+    return null;
   }
 
-  final parsed = await jsonDecode(jsonString);
+  var parsed = await jsonDecode(jsonString);
 
   if (parsed is Map) {
-    return Left(parsed);
+    return Either.left(parsed);
   } else if (parsed is List) {
-    return Right(parsed);
+    return Either.right(parsed);
   } else {
-    logger.severe('Parsed JSON value is not a Map or List: $parsed');
+    logger.severe('Returned JSON value is not a valid Map or List: $parsed');
     return null;
   }
 }

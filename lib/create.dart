@@ -1,4 +1,5 @@
 export 'package:h4/src/create_error.dart';
+export 'package:h4/src/event.dart';
 import 'package:h4/src/h4.dart';
 import 'package:h4/src/router.dart';
 

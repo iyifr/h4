@@ -49,14 +49,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.18.0"
-  compute:
-    dependency: "direct main"
-    description:
-      name: compute
-      sha256: b70190d59352a267a9765a77b97d0f619874c84d30c5193ae71050ee22ab2ef7
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.2"
   console:
     dependency: "direct main"
     description:
@@ -97,14 +89,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "5.4.3+1"
-  either_dart:
-    dependency: "direct main"
-    description:
-      name: either_dart
-      sha256: "0b57f6a9410ce0ba2cc340220109f545bf4bad1b06b242219f0af11ab9e84f0e"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.0"
   file:
     dependency: transitive
     description:
@@ -386,7 +370,7 @@ packages:
     source: hosted
     version: "14.2.3"
   watcher:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: watcher
       sha256: "3d2ad6751b3c16cf07c7fca317a1413b3f26530319181b37e3b9039b84fc01d8"

@@ -13,17 +13,17 @@ topics:
 
 executables:
   init: init
+  watch: start
 
 # Add regular dependencies here.
 dependencies:
   meta: ^1.15.0
-  compute: ^1.0.2
   logging: ^1.2.0
-  either_dart: ^1.0.0
   http: ^1.2.1
   args: ^2.5.0
   console: ^4.1.0
   path: ^1.9.0
+  watcher: ^1.1.0
 
 dev_dependencies:
   lints: ^4.0.0

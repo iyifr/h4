@@ -21,6 +21,7 @@ void main(List<String> arguments) async {
 
   router.post("/vamos/:id/**", (event) async {
     var body = await readRequestBody(event);
+    print(body["map"]);
     var header = getHeader(event, HttpHeaders.userAgentHeader);
     var query = getQueryParams(event);
     setResponseHeader(event, HttpHeaders.contentTypeHeader,
@@ -40,7 +41,7 @@ void main(List<String> arguments) async {
     }
   }
 
-  router.get<Future<dynamic>>('/int', (event) async {
+  router.get<Future<dynamic>>('/int', (H4Event event) async {
     try {
       String result = await unreliableFunction();
       return result;
