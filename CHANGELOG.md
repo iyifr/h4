@@ -12,7 +12,7 @@
 
 ## 0.1.3
 
-- ### Patch Release
+- ### Release
   - Deprecated app.onRequest() signature for registering middleware.
   - Added new signature for adding middleware to requests.
   ```dart
