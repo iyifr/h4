@@ -1,3 +1,30 @@
+## 0.2.0
+
+- #### Minor Release
+
+  - Improved CLI
+
+    - Added a new command H4 **start** which starts your app locally.
+
+    ```powershell
+    h4 start
+    ```
+
+    _or_
+
+    ```powershell
+    dart pub global run h4:start
+    ```
+
+    #### --dev flag
+
+    - Run the command with the --dev flag to restart the server when you make changes to your files
+
+  - ### New Utilities
+    - getQuery
+    - setResponseHeader
+    - getHeader
+
 ## 0.1.4
 
 - #### Release
