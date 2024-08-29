@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -51,8 +52,7 @@ void main(List<String> args) async {
       });
 
       // Wait for the server process to exit
-      final exitCode = await serverProcess!.exitCode;
-      print('Server process exited with code: $exitCode');
+      // final exitCode = await serverProcess!.exitCode;
     });
   }
 
@@ -77,9 +77,9 @@ void main(List<String> args) async {
     } else {
       serverProcess = await Process.start('dart', ['run', 'lib/index.dart']);
       // print('Server started with PID: ${serverProcess.pid}');
-      Console.setBackgroundColor(7, bright: true);
+      Console.setBackgroundColor(6, bright: true);
       Console.setTextColor(3, bright: true);
-      Console.write('\n ^-^ H4 CLI -- \n'.toUpperCase());
+      Console.write('\n ^-^ H4 CLI -- \n');
       Console.resetBackgroundColor();
 
       // Handle server process stdout
@@ -108,13 +108,25 @@ void watchDirectory(String dirPath, {required handleFileChange}) {
   final watcher = DirectoryWatcher(dirPath);
 
   print('Watching directory: $dirPath');
+  Timer? debounceTimer;
+  final debounceTime = Duration(milliseconds: 100);
 
   watcher.events.listen((event) async {
-    // final relativePath = path.relative(event.path, from: dirPath);
+    final relativePath = path.relative(event.path, from: dirPath);
 
     switch (event.type) {
       case ChangeType.MODIFY:
-        await handleFileChange();
+        if (debounceTimer != null && debounceTimer!.isActive) {
+          debounceTimer!.cancel();
+        }
+
+        debounceTimer = Timer(debounceTime, () async {
+          Console.write('Noticed file change at: ');
+          Console.setItalic(true);
+          Console.write('$relativePath \n');
+          Console.setItalic(false);
+          await handleFileChange();
+        });
         break;
     }
   });

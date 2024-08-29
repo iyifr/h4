@@ -2,14 +2,11 @@
 
 ![og](https://assets.uploadfast.dev/h4-dev.png)
 
-> A **lightweight**, **minimal**, and **incredibly fast** HTTP framework for productive and fun API
-> development with dart.
+> A **lightweight**, **minimal** HTTP framework for productive and fun API development with dart.
 
 **This is a new project under active development**
 
-**Do not use in production as it could break unexpectedly.**
-
-There's an express-like server framework called `Alfred` in the dart ecosystem.
+There's an express-like server framework in the dart ecosystem called `Alfred`.
 
 This is the [H3](https://h3.unjs.io) implementation with similar design goals. Special thanks to
 [Pooya Parsa](https://github.com/pi0) and the [Unjs](https://github.com/unjs) community for making a
@@ -117,8 +114,8 @@ The client recieves this json payload -
 
 ```json
 {
-	"status": 400,
-	"message": "Womp Womp"
+ "status": 400,
+ "message": "Womp Womp"
 }
 ```
 
