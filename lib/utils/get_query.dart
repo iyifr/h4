@@ -13,9 +13,7 @@ import 'package:h4/src/event.dart';
 /// });
 /// ```
 getQueryParams(H4Event event) {
-  Uri? reqUri = event.node["value"]?.requestedUri;
+  var reqUri = event.node["value"]?.uri.queryParameters;
 
-  var result = Uri.parse(reqUri.toString()).queryParameters;
-
-  return result;
+  return reqUri;
 }
