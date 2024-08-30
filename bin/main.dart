@@ -1,5 +1,4 @@
 import 'package:h4/create.dart';
-import 'package:h4/utils/req_utils.dart';
 import 'package:h4/utils/get_query.dart';
 
 void main() async {
@@ -14,14 +13,9 @@ void main() async {
 
   var router = createRouter();
 
-  app.use(router);
+  app.use(router, basePath: '/');
 
-  router.get<Future<String>>("/", (event) async {
-    // Still 'Ogunlepon'
-    print(event.context["user"]);
-    print(getQueryParams(event));
-    var formdata = await readFormData(event);
-    print(formdata.getAll('file'));
-    return 'Hello world';
+  router.get("/", (event) async {
+    return 'Hello';
   });
 }

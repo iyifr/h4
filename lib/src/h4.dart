@@ -42,6 +42,7 @@ typedef MiddlewareStack = Map<String, Either<Middleware?, ErrorHandler?>?>?;
 class H4 {
   HttpServer? server;
   H4Router? router;
+  Map<String, H4Router> routeStack = {};
   late MiddlewareStack middlewares;
 
   // ignore: prefer_function_declarations_over_variables
@@ -109,7 +110,8 @@ class H4 {
   }
 
   /// Add a [H4Router] to the app instance for mapping requests.
-  void use(H4Router router) {
+  void use(H4Router router, {String basePath = '/'}) {
+    routeStack[basePath] = router;
     this.router = router;
   }
 
@@ -173,16 +175,33 @@ class H4 {
 
   _bootstrap() {
     server!.listen((HttpRequest request) {
-      if (router == null) {
-        logger.warning("Router instance is missing.");
+      if (routeStack.values.isEmpty) {
+        logger.warning("No router instances were found.");
         return404(request)(middlewares, null);
         return;
       }
 
-      // Find handler for that request
-      var match = router?.lookup(request.uri.path);
+      H4Router? hRouter;
+      String routeKey = '';
 
-      var params = router?.getParams(request.uri.path);
+      for (var key in routeStack.keys) {
+        if (key != '/') {
+          if (request.uri.path.startsWith(key)) {
+            hRouter = routeStack[key];
+            routeKey = key;
+          }
+        } else {
+          hRouter = routeStack['/'];
+          routeKey = key;
+        }
+      }
+
+      var routePath = request.uri.path.replaceFirstMapped(routeKey, (m) => '/');
+
+      // Find handler for that request
+      var match = hRouter?.lookup(routePath);
+
+      var params = hRouter?.getParams(routePath);
       params ??= {};
 
       // Handling starts here.
