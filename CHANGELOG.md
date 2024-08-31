@@ -1,29 +1,48 @@
-## 0.2.0
+## 0.3.0 (Minor)
 
-- #### Minor Release
+- NEW `readFormData` utility - familiar formdata parsing API
 
-  - Improved CLI
+```dart
+apiRouter.get("/signup", (event) async  {
+  var formData = await readFormData(event);
 
-    - Added a new command H4 **start** which starts your app locally.
+  var username = formData.get('username');
+  var password = formData.get('password');
 
-    ```powershell
-    h4 start
-    ```
+  // ALSO included..
+  var allNames = formdata.getAll('names') // return List<String>
 
-    _or_
+  userService.signup(username, password);
+  event.statusCode = 201;
 
-    ```powershell
-    dart pub global run h4:start
-    ```
+  return 'Hi from /api';
+});
+```
 
-    #### --dev flag
+- NEW `getRequestIp` and `getRequestOrigin` utilities
 
-    - Run the command with the --dev flag to restart the server when you make changes to your files
+## 0.2.0 (Minor)
 
-  - ### New Utilities
-    - getQuery
-    - setResponseHeader
-    - getHeader
+- Added the `start` command to the CLI, `H4 start` which starts your app locally.
+
+  ```powershell
+  h4 start
+  ```
+
+  _or_
+
+  ```powershell
+  dart pub global run h4:start
+  ```
+
+  #### --dev flag
+
+  - Run the command with the --dev flag to restart the server when you make changes to your files
+
+- ### New Utilities
+  - `getQuery`
+  - `setResponseHeader`
+  - `getHeader`
 
 ## 0.1.4
 

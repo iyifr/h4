@@ -134,7 +134,7 @@ void main() {
         options: Options(
           headers: {'content-type': 'application/json'},
         ));
-    expect(req.data, '{"hi":12}');
+    expect(jsonDecode(req.data), {"hi": 12});
   });
 
   test('Correctly parses query parameters', () async {
@@ -145,5 +145,39 @@ void main() {
     final response = await dio.get('/body?query=iyimide&answer=laboss');
 
     expect(jsonDecode(response.data), {"query": "iyimide", "answer": "laboss"});
+  });
+
+  test('Regex pattern for routes', () {
+    final regex = RegExp(
+      r'^(?:'
+      r'/'
+      r'|/(?:[\p{L}\p{N}_-]+(?:/[\p{L}\p{N}_-]+)*/?)'
+      r'|/(?:[\p{L}\p{N}_-]+/)*(?::[\p{L}\p{N}_]+)(?:/[\p{L}\p{N}_-]+)*(?:/(?:[\p{L}\p{N}_-]+/)*(?::[\p{L}\p{N}_]+)(?:/[\p{L}\p{N}_-]+)*)*/?'
+      r'|/[\p{L}\p{N}_-]+/:[^/]+/\*\*'
+      r'|/[\p{L}\p{N}_-]+/\*\*'
+      r'|/[\p{L}\p{N}_-]+/\*'
+      r'| '
+      r'|\*'
+      r')$',
+      unicode: true,
+    );
+
+    final testCases = [
+      '/:id/base/:studentId',
+      '/user/:id/posts/:postId',
+      '/api/:version/users/:userId/profile',
+      '/:id/:uuid/:hqhaId',
+      '/user/:id/:postId',
+      '/user/123',
+      '/user/:id',
+      '/user/:id/posts',
+      '/',
+      ' ',
+      '*',
+    ];
+
+    for (final test in testCases) {
+      expect(regex.hasMatch(test), true);
+    }
   });
 }

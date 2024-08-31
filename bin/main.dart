@@ -1,4 +1,8 @@
+import 'dart:io';
+
 import 'package:h4/create.dart';
+import 'package:h4/utils/req_utils.dart';
+import 'package:h4/utils/set_response_header.dart';
 
 void main() async {
   var app = createApp(
@@ -6,6 +10,10 @@ void main() async {
     onRequest: (event) {
       // PER REQUEST local state😻
       event.context["user"] = 'Ogunlepon';
+
+      setResponseHeader(event,
+          header: HttpHeaders.contentTypeHeader,
+          value: 'text/html; charset=utf-8');
     },
     afterResponse: (event) => {},
   );
@@ -16,11 +24,21 @@ void main() async {
   app.use(router, basePath: '/');
   app.use(apiRouter, basePath: '/api');
 
-  router.get("/", (event) {
-    return 'Hello from /';
+  router.get("/vamos/:id/bake/:cakeId", (event) {
+    return event.params;
   });
 
-  apiRouter.get("/", (event) {
-    return 'Hi from /api';
+  apiRouter.get("/signup", (event) async {
+    var formData = await readFormData(event);
+
+    var username = formData.get('username');
+    var password = formData.get('password');
+
+    print(getRequestIp(event));
+
+    // userService.signup(username, password);
+    event.statusCode = 201;
+
+    return 'Hi from /api with $username, $password';
   });
 }

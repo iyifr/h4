@@ -73,32 +73,38 @@ class Trie {
 
     for (String pathPiece in pathPieces) {
       int index = pathPieces.indexOf(pathPiece);
+
       if (currNode?.children[pathPiece] == null) {
+        print(currNode);
         currNode?.children.forEach((key, value) {
           if ((key.startsWith(":") || key.startsWith("*")) && value.isLeaf) {
-            // Do not behave like a wildcard. Only match if the param route is an exact match.
-            if (pathPieces.lastOrNull == pathPiece) {
-              if (index == pathPieces.length - 1) {
-                laHandler = value.handlers;
-              }
-            } else {
-              // Handle weird edge case where a handler with id as a leaf is defined in route trie
-              var result = deepTraverse(value.children);
-
-              if (result["leaf"] == pathPieces.lastOrNull) {
-                laHandler = result["handlers"];
-              }
+            if (index == pathPieces.length - 1) {
+              laHandler = value.handlers;
             }
           }
 
+          // Multiple Params
           if (key.startsWith(":") && !value.isLeaf) {
-            var result = deepTraverse(value.children);
+            var maps = deepTraverse(value.children);
+            var result = maps["result"];
+            var prev = maps["prev"];
 
-            if (result["leaf"] == pathPieces.lastOrNull) {
-              laHandler = result["handlers"];
+            if (result?["leaf"] == pathPieces.lastOrNull) {
+              laHandler = result?["handlers"];
+            }
+
+            if (result?["leaf"] != null) {
+              if (result!["leaf"].startsWith(":")) {
+                if (pathPieces[pathPieces.length - 2] == prev?["key"]) {
+                  laHandler = result["handlers"];
+                }
+              }
             }
           }
         });
+      }
+      if (laHandler != null) {
+        break;
       }
       currNode = currNode?.children[pathPiece];
     }
@@ -144,8 +150,10 @@ class Trie {
           if (key.startsWith("**") && value.isLeaf) {
             laHandler = value.handlers;
           } else {
-            var result = deepTraverse(value.children);
-            laHandler = result["handlers"];
+            var result = deepTraverse(value.children)["result"];
+            if (result?["leaf"] == '**') {
+              laHandler = result?["handlers"];
+            }
           }
         });
       }

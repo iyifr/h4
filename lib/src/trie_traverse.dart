@@ -32,23 +32,23 @@ class TrieNodeStack<T> {
   }
 }
 
-Map<String, dynamic> deepTraverse(Map<String, TrieNode> nodes) {
+Map<String, Map<String, dynamic>> deepTraverse(Map<String, TrieNode> nodes) {
   TrieNodeStack<MapEntry<String, TrieNode>> stack =
       TrieNodeStack.from(nodes.entries);
   Map<String, dynamic> result = {'handlers': null, 'leaf': null};
+  Map<String, dynamic> prev = {};
 
   while (stack.isNotEmpty) {
     MapEntry<String, TrieNode> entry = stack.pop();
     String key = entry.key;
     TrieNode value = entry.value;
-
     if (value.isLeaf) {
       result['handlers'] = value.handlers;
       result['leaf'] = key;
-      return result;
-    } else if (value.children.isNotEmpty) {
+    } else if (value.children.isNotEmpty || !value.isLeaf) {
+      prev['key'] = key;
       stack.addAll(value.children.entries);
     }
   }
-  return result;
+  return {'result': result, 'prev': prev};
 }
