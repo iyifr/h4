@@ -1,6 +1,8 @@
+import 'package:h4/src/logger.dart';
+
 List<String> extractPieces(String path) {
   if (!isValidHttpPathPattern(path)) {
-    throw FormatException('Invalid http path, Got - $path');
+    logger.severe('Invalid http path, Got - $path');
   }
   List<String> result = path == '/' ? [] : path.split('/')
     ..removeWhere((piece) => piece.isEmpty);
@@ -17,6 +19,7 @@ bool isValidHttpPathPattern(String pattern) {
     r'|/[\p{L}\p{N}_-]+/:[^/]+/\*\*'
     r'|/[\p{L}\p{N}_-]+/\*\*'
     r'|/[\p{L}\p{N}_-]+/\*'
+    r'|'
     r'|\*'
     r')$',
     unicode: true,

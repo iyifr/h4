@@ -1,8 +1,11 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 
 import 'package:h4/create.dart';
 import 'package:h4/src/h4.dart';
 import 'package:h4/src/router.dart';
+import 'package:h4/utils/get_query.dart';
 import 'package:h4/utils/read_request_body.dart';
 import 'package:test/test.dart';
 
@@ -132,5 +135,15 @@ void main() {
           headers: {'content-type': 'application/json'},
         ));
     expect(req.data, '{"hi":12}');
+  });
+
+  test('Correctly parses query parameters', () async {
+    router.get('/body', (event) async {
+      return await getQueryParams(event);
+    });
+
+    final response = await dio.get('/body?query=iyimide&answer=laboss');
+
+    expect(jsonDecode(response.data), {"query": "iyimide", "answer": "laboss"});
   });
 }

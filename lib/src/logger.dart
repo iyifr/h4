@@ -22,9 +22,15 @@ initLogger() {
 
       case 'SEVERE':
         {
-          Console.setFramed(true);
-          Console.write(record.level.name);
-          Console.write(record.message);
+          Console.setBackgroundColor(1, bright: true);
+          Console.setTextColor(0, bright: true);
+          // ignore: unnecessary_string_escapes
+          Console.write('\n ${record.level.name} ');
+          Console.resetBackgroundColor();
+          Console.resetTextColor();
+          Console.setBold(false);
+          Console.write(' ▲▼ ${record.message}\n');
+          Console.resetAll();
         }
     }
   });
