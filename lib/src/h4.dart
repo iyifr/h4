@@ -185,6 +185,11 @@ class H4 {
       String routeKey = '';
 
       for (var key in routeStack.keys) {
+        if (!key.startsWith('/')) {
+          logger.warning(
+              'Invalid base path! - found $key - change the base path to /$key');
+        }
+
         if (key != '/') {
           if (request.uri.path.startsWith(key)) {
             hRouter = routeStack[key];
@@ -192,11 +197,16 @@ class H4 {
           }
         } else {
           hRouter = routeStack['/'];
-          routeKey = key;
+          routeKey = '/';
         }
       }
 
-      var routePath = request.uri.path.replaceFirstMapped(routeKey, (m) => '/');
+      var routePath = request.uri.path;
+
+      if (routeKey != '/') {
+        routePath = request.uri.path.replaceFirstMapped(
+            routeKey, (m) => m.toString() == routeKey ? '/' : '');
+      }
 
       // Find handler for that request
       var match = hRouter?.lookup(routePath);

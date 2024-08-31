@@ -1,5 +1,4 @@
 import 'package:h4/create.dart';
-import 'package:h4/utils/get_query.dart';
 
 void main() async {
   var app = createApp(
@@ -12,10 +11,16 @@ void main() async {
   );
 
   var router = createRouter();
+  var apiRouter = createRouter();
 
   app.use(router, basePath: '/');
+  app.use(apiRouter, basePath: '/api');
 
-  router.get("/", (event) async {
-    return 'Hello';
+  router.get("/", (event) {
+    return 'Hello from /';
+  });
+
+  apiRouter.get("/", (event) {
+    return 'Hi from /api';
   });
 }
