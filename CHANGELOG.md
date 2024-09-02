@@ -1,29 +1,93 @@
-## 0.2.0
+## 0.3.0 (Minor)
 
-- #### Minor Release
+- **NEW** Multiple Routers with `basePath`
 
-  - Improved CLI
+```dart
 
-    - Added a new command H4 **start** which starts your app locally.
+void main() async {
+  var app = createApp(
+    port: 5173,
+    onRequest: (event) {
+      // PER REQUEST local state😻
+      event.context["user"] = 'Ogunlepon';
 
-    ```powershell
-    h4 start
-    ```
+      setResponseHeader(event,
+          header: HttpHeaders.contentTypeHeader,
+          value: 'text/html; charset=utf-8');
+    },
+    afterResponse: (event) => {},
+  );
 
-    _or_
+  var router = createRouter();
+  var apiRouter = createRouter();
 
-    ```powershell
-    dart pub global run h4:start
-    ```
+  app.use(router, basePath: '/');
+  app.use(apiRouter, basePath: '/api');
 
-    #### --dev flag
+  router.get("/vamos/:id/base/:studentId", (event) {
+    return event.params;
+  });
 
-    - Run the command with the --dev flag to restart the server when you make changes to your files
+  apiRouter.get("/signup", (event) async {
+    var formData = await readFormData(event);
 
-  - ### New Utilities
-    - getQuery
-    - setResponseHeader
-    - getHeader
+    var username = formData.get('username');
+    var password = formData.get('password');
+
+    // userService.signup(username, password);
+    event.statusCode = 201;
+
+    return 'Hi from /api with $username, $password';
+  });
+}
+```
+
+- **NEW** `readFormData` utility - familiar formdata parsing API
+
+```dart
+apiRouter.get("/signup", (event) async  {
+  var formData = await readFormData(event);
+
+  var username = formData.get('username');
+  var password = formData.get('password');
+
+  // ALSO included..
+  var allNames = formdata.getAll('names') // return List<String>
+
+  userService.signup(username, password);
+  event.statusCode = 201;
+
+  return 'Hi from /api';
+});
+```
+
+- **NEW** `getRequestIp` and `getRequestOrigin` utilities
+- **PATCHED** `H4Event` params now correctly parses more than one param in the route string. e.g
+  `'/user/:userId/profile/:projectId'`
+- **PATCHED** all bugs in the behaviour of param routes.
+
+## 0.2.0 (Minor)
+
+- Added the `start` command to the CLI, `H4 start` which starts your app locally.
+
+  ```powershell
+  h4 start
+  ```
+
+  _or_
+
+  ```powershell
+  dart pub global run h4:start
+  ```
+
+  #### --dev flag
+
+  - Run the command with the --dev flag to restart the server when you make changes to your files
+
+- ### New Utilities
+  - `getQuery`
+  - `setResponseHeader`
+  - `getHeader`
 
 ## 0.1.4
 

@@ -186,7 +186,7 @@ class H4 {
 
       for (var key in routeStack.keys) {
         if (!key.startsWith('/')) {
-          logger.warning(
+          logger.severe(
               'Invalid base path! - found $key - change the base path to /$key');
         }
 
@@ -264,8 +264,8 @@ NotFoundHandler return404(HttpRequest request) {
     return defineEventHandler(
       (event) {
         event.statusCode = 404;
-        setResponseHeader(event, HttpHeaders.contentTypeHeader,
-            value: 'application/json');
+        setResponseHeader(event,
+            header: HttpHeaders.contentTypeHeader, value: 'application/json');
         return {
           "statusCode": 404,
           "statusMessage": "Not found",

@@ -5,13 +5,20 @@ import 'dart:io';
 import 'package:h4/create.dart';
 import 'package:mime/mime.dart';
 
-export 'package:h4/utils/req_utils.dart' hide handleMultipartFormdata;
+export 'package:h4/utils/req_utils.dart' hide handleMultipartFormdata, FormData;
 
-getRequestIp(H4Event event) {
-  return event.node["value"]?.headers.value("x-forwarded-for");
+String? getRequestIp(H4Event event) {
+  var ip = event.node["value"]?.headers
+      .value("x-forwarded-for")
+      ?.split(',')[0]
+      .trim();
+
+  ip ??= event.node["value"]!.connectionInfo?.remoteAddress.address;
+
+  return ip;
 }
 
-getRequestUrl(H4Event event) {
+String? getRequestOrigin(H4Event event) {
   return event.node["value"]?.headers.value(HttpHeaders.hostHeader);
 }
 

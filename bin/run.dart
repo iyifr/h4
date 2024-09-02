@@ -24,8 +24,6 @@ void main(List<String> arguments) async {
     print(body["map"]);
     var header = getHeader(event, HttpHeaders.userAgentHeader);
     var query = getQueryParams(event);
-    setResponseHeader(event, HttpHeaders.contentTypeHeader,
-        value: 'application/json');
     return [header, body, query, event.params];
   });
 

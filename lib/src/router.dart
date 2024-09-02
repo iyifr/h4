@@ -54,7 +54,6 @@ class H4Router {
     var result = routes.search(pathChunks);
 
     result ??= routes.matchParamRoute(pathChunks);
-
     result ??= routes.matchWildCardRoute(pathChunks);
 
     return result;
