@@ -2,20 +2,16 @@
 
 ![og](https://assets.uploadfast.dev/H4-poster-k18t.png)
 
-> A HTTP library for productive and fun API development with dart.
+A HTTP framework for productive and fun API development with dart.
 
-**This is a new project under active development**
+Inspired by [unjs H3](https://h3.unjs.io).
 
-There's an express-like server framework in the dart ecosystem called `Alfred`.
-
-This is the [H3](https://h3.unjs.io) implementation with similar design goals. Special thanks to
-[Pooya Parsa](https://github.com/pi0) and the [Unjs](https://github.com/unjs) community for making a
-awesome http library.
+**This is a new project under active development**, production use is not advised.
 
 ## Features
 
 - **Lightweight**: H4 ships with a small core and a set of composable utilities.
-- **Middleware**: H4 comes with built-in `onRequest` and `onError` middleware.
+- **Middleware**: H4 comes with `onRequest` and `onError` middleware.
 - **Generic Handlers**: Specify the return type of your handler functions.
 
 ## Getting Started
@@ -50,18 +46,16 @@ void main() {
 
 ## Examples
 
-### Manual Start
+### Hello world
 
 ```dart
 void main() {
-  var app = createApp(port: 4000, autoStart: false);
+  var app = createApp(port: 4000);
   var router = createRouter();
 
   app.use(router);
 
-  router.get("/hi", (event) => "Hi")
-
-  app.start()
+  router.get("/", (event) => "Hello world")
 }
 ```
 
@@ -79,6 +73,7 @@ You can register global hooks:
 
 - `onRequest`
 - `onError`
+- `afterResponse`
 
 These hooks are called for every request and can be used to add global logic to your app such as
 logging, error handling, etc.
