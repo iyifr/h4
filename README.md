@@ -1,8 +1,8 @@
 # H4.
 
-![og](https://assets.uploadfast.dev/h4-dev.png)
+![og](https://assets.uploadfast.dev/H4-poster-k18t.png)
 
-> A **lightweight**, **minimal** HTTP framework for productive and fun API development with dart.
+> A HTTP library for productive and fun API development with dart.
 
 **This is a new project under active development**
 
@@ -114,8 +114,8 @@ The client recieves this json payload -
 
 ```json
 {
- "status": 400,
- "message": "Womp Womp"
+	"status": 400,
+	"message": "Womp Womp"
 }
 ```
 

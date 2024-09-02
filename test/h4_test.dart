@@ -88,7 +88,7 @@ void main() {
     expect(response.data, '6700');
   });
 
-  test('Handles single dynamic routes', () async {
+  test('Handles single param routes', () async {
     router.get('/user/:id', (event) => event.params['id']);
 
     final response = await dio.get('/user/xyz_abc_123');
