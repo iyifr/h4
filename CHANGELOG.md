@@ -1,6 +1,6 @@
 ## 0.3.0 (Minor)
 
-- NEW `readFormData` utility - familiar formdata parsing API
+- **NEW** `readFormData` utility - familiar formdata parsing API
 
 ```dart
 apiRouter.get("/signup", (event) async  {
@@ -19,7 +19,10 @@ apiRouter.get("/signup", (event) async  {
 });
 ```
 
-- NEW `getRequestIp` and `getRequestOrigin` utilities
+- **NEW** `getRequestIp` and `getRequestOrigin` utilities
+- **PATCHED** `H4Event` params now correctly parses more than one param in the route string. e.g
+  `'/user/:userId/profile/:projectId'`
+- **PATCHED** all bugs in the behaviour of param routes.
 
 ## 0.2.0 (Minor)
 

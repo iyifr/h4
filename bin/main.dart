@@ -24,7 +24,7 @@ void main() async {
   app.use(router, basePath: '/');
   app.use(apiRouter, basePath: '/api');
 
-  router.get("/vamos/:id/bake/:cakeId", (event) {
+  router.get("/vamos/:id/base/:studentId", (event) {
     return event.params;
   });
 

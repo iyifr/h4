@@ -75,7 +75,6 @@ class Trie {
       int index = pathPieces.indexOf(pathPiece);
 
       if (currNode?.children[pathPiece] == null) {
-        print(currNode);
         currNode?.children.forEach((key, value) {
           if ((key.startsWith(":") || key.startsWith("*")) && value.isLeaf) {
             if (index == pathPieces.length - 1) {
@@ -111,28 +110,23 @@ class Trie {
     return laHandler;
   }
 
-  Map<String, String> getParams(pathPieces) {
-    Map<String, String> params = {};
+  Map<String, String> getParams(List<String> pathPieces) {
+    Map<String, dynamic> params = {};
     TrieNode? currNode = root;
-    for (String pathPiece in pathPieces) {
-      if (currNode?.children[pathPiece] == null) {
-        currNode?.children.forEach((key, value) {
-          if (key.startsWith(":")) {
-            params[key.replaceAll(":", "")] = pathPiece;
-          }
+    params = traverseTrieForSpecialChunks(currNode.children);
+    Map<String, String> theprms = {};
 
-          if (key.startsWith("*")) {
-            params[key.replaceAll("*", "_")] = pathPiece;
-          }
-
-          if (key.startsWith("**")) {
-            params[key.replaceAll("**", "_")] = pathPiece;
-          }
-        });
+    params.forEach((key, value) {
+      if (value["leaf"] == true) {
+        theprms[key] = pathPieces.last;
+      } else {
+        List<String> nw = value["prev"].split("/");
+        var placeholderChunks = nw..removeWhere((item) => item.isEmpty);
+        theprms.addEntries(
+            matchPlaceholders(placeholderChunks, pathPieces).entries);
       }
-      currNode = currNode?.children[pathPiece];
-    }
-    return params;
+    });
+    return theprms;
   }
 
   matchWildCardRoute(List<String> pathPieces) {
@@ -161,4 +155,27 @@ class Trie {
     }
     return laHandler;
   }
+}
+
+Map<String, String> matchPlaceholders(
+    List<String> placeholder, List<String> realString) {
+  Map<String, String> replacements = {};
+
+  // Iterate only up to the length of the placeholder list
+  for (int i = 0; i < placeholder.length; i++) {
+    // Check if we're still within the bounds of the realString
+    if (i < realString.length) {
+      if (placeholder[i].startsWith(':')) {
+        replacements[placeholder[i].replaceFirst(':', '')] = realString[i];
+      } else if (placeholder[i] != realString[i]) {
+        // Non-placeholder elements must match exactly
+        return {};
+      }
+    } else {
+      // realString is shorter than placeholder
+      return {};
+    }
+  }
+
+  return replacements;
 }
