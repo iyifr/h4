@@ -31,6 +31,10 @@ getRequestProtocol(H4Event event) {
   return event.node["value"]?.headers.value("x-forwarded-proto") ?? "http";
 }
 
+String? getRouterParams(H4Event event, {required String name}) {
+  return event.params.containsKey(name) ? event.params[name] : null;
+}
+
 class FormData {
   final Map<String, List<String>> _data = {};
 

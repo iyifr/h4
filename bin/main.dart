@@ -26,7 +26,7 @@ void main() async {
   app.use(apiRouter, basePath: '/api');
 
   router.get("/vamos/:id/base/:studentId", (event) {
-    return event.params;
+    return getRouterParams(event, name: "id");
   });
 
   apiRouter.get("/signup", (event) async {
