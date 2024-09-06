@@ -53,7 +53,7 @@ Future<void> _initH4InCurrentDirectory() async {
 
 Future<void> _createAppFiles(String appName,
     {bool inCurrentDir = false}) async {
-  Console.setBackgroundColor(7, bright: true);
+  Console.setBackgroundColor(4, bright: true);
   Console.setTextColor(0);
   Console.write('\nCreating a new H4 app in - /$appName');
   Console.resetBackgroundColor();
@@ -77,16 +77,21 @@ Future<void> _createAppFiles(String appName,
       Process.runSync('dart', ['pub', 'add', 'h4'],
           workingDirectory: Directory.current.path);
       mainFile = File('lib/index.dart');
+      Console.setBlink(false);
     } else {
       mainFile = File('$appName/lib/index.dart');
       defaultFile = File('$appName/lib/$appName.dart');
-      await runProcessInDirectory(appName, ['dart', 'pub', 'add', 'h4']);
+      await runProcessInDirectory(appName, ['dart', 'pub', 'add', 'h4'])
+          .then((value) => Console.setBlink(false));
     }
 
-    Console.setBlink(false);
     Console.setBold(false);
     await _writeMainFile(mainFile);
-    await defaultFile.delete();
+
+    if (await defaultFile.exists()) {
+      await defaultFile.delete();
+    }
+
     Console.setBold(true);
     Console.write('\nH4 initialized successfully'.toUpperCase());
   } catch (e) {

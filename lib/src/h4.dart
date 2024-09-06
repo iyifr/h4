@@ -4,7 +4,7 @@ import 'package:h4/src/error_middleware.dart';
 import 'package:h4/src/logger.dart';
 import 'package:h4/src/port_taken.dart';
 import 'package:h4/src/router.dart';
-import 'package:h4/utils/set_response_header.dart';
+import 'package:h4/utils/response_utils.dart';
 
 import '/src/index.dart';
 import 'initialize_connection.dart';

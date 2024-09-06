@@ -3,7 +3,7 @@ import 'dart:io';
 
 import 'package:h4/src/event.dart';
 import 'package:h4/src/h4.dart';
-import 'package:h4/utils/set_response_header.dart';
+import 'package:h4/utils/response_utils.dart';
 
 ///
 /// The `defineErrorHandler` function takes three parameters:

@@ -18,7 +18,7 @@ String? getRequestIp(H4Event event) {
   return ip;
 }
 
-String? getRequestOrigin(H4Event event) {
+String? getRequestHost(H4Event event) {
   return event.node["value"]?.headers.value(HttpHeaders.hostHeader);
 }
 
