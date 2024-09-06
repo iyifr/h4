@@ -118,7 +118,7 @@ class Trie {
 
     params.forEach((key, value) {
       if (value["leaf"] == true) {
-        theprms[key] = pathPieces.last;
+        theprms[key] = pathPieces.lastOrNull ?? "";
       } else {
         List<String> nw = value["prev"].split("/");
         var placeholderChunks = nw..removeWhere((item) => item.isEmpty);

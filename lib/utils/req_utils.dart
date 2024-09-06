@@ -22,23 +22,14 @@ String? getRequestHost(H4Event event) {
   return event.node["value"]?.headers.value(HttpHeaders.hostHeader);
 }
 
-// Future<List<Map<String, dynamic>>?> readMultipartFormData(H4Event event) async {
-//   var contentType = event.node["value"]?.headers.contentType;
-//   if (contentType?.mimeType == 'multipart/form-data') {
-//     var request = event.node["value"];
+String? getRequestUrl(H4Event event) {
+  return '${getRequestProtocol(event)}://${getRequestHost(event)}${event.path}';
+}
 
-//     final boundary = contentType!.parameters['boundary'];
-//     if (boundary != null) {
-//       return await handleMultipartFormdata(request!, boundary);
-//     } else {
-//       print('Invalid multipart/form-data request: missing boundary');
-//     }
-//   } else {
-//     print(
-//         'Unsupported content type: ${contentType?.mimeType} expected multipart/form-data');
-//   }
-//   return null;
-// }
+/// ### Get the request protocol.
+getRequestProtocol(H4Event event) {
+  return event.node["value"]?.headers.value("x-forwarded-proto") ?? "http";
+}
 
 class FormData {
   final Map<String, List<String>> _data = {};

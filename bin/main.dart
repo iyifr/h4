@@ -10,6 +10,7 @@ void main() async {
     onRequest: (event) {
       // PER REQUEST local state😻
       event.context["user"] = 'Ogunlepon';
+      print(getRequestUrl(event));
 
       setResponseHeader(event,
           header: HttpHeaders.contentTypeHeader,
