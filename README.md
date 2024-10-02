@@ -109,8 +109,8 @@ The client recieves this json payload -
 
 ```json
 {
-	"status": 400,
-	"message": "Womp Womp"
+ "status": 400,
+ "message": "Womp Womp"
 }
 ```
 

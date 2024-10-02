@@ -1,14 +1,19 @@
 import 'package:h4/src/event.dart';
 import 'dart:io';
 
+/// **Set the value of outgoing response header**
+///
+/// Parameters:
+/// - `event`: An `H4Event` instance containing the HTTP request.
+/// - `header`: The header you would like set
+/// - `value`: What value to set the header to.
+///
 setResponseHeader(H4Event event,
     {required String header, required String value}) {
   event.node["value"]?.response.headers.set(header, value);
 }
 
-/// Retrieves the headers of the HTTP response from an `H4Event` instance.
-///
-/// The `getResponseHeaders` function is used to extract the headers of the HTTP response from an `H4Event` object. The `H4Event` object is expected to have a `node` property that contains the HTTP request, and the `node["value"]` property is assumed to represent the incoming HTTP request.
+/// **Get the outgoing response headers.**
 ///
 /// Parameters:
 /// - `event`: An `H4Event` instance containing the HTTP request.

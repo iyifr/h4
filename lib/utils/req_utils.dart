@@ -18,24 +18,26 @@ String? getRequestIp(H4Event event) {
   return ip;
 }
 
+/// **Get request host**
+///
+/// Either **http** or **https**
 String? getRequestHost(H4Event event) {
   return event.node["value"]?.headers.value(HttpHeaders.hostHeader);
 }
 
-String? getRequestUrl2(H4Event event) {
-  return event.node["value"]?.headers.value("Origin");
-}
-
+/// Get the entire request URL.
+/// 
+/// Constructed with the protocol, host and path.
 String? getRequestUrl(H4Event event) {
   return '${getRequestProtocol(event)}://${getRequestHost(event)}${event.path}';
 }
 
-/// ### Get the request protocol.
+/// #### Get the request protocol.
 getRequestProtocol(H4Event event) {
   return event.node["value"]?.headers.value("x-forwarded-proto") ?? "http";
 }
 
-String? getRouterParams(H4Event event, {required String name}) {
+String? getRouteParam(H4Event event, {required String name}) {
   return event.params.containsKey(name) ? event.params[name] : null;
 }
 
