@@ -5,13 +5,15 @@ import 'dart:math';
 
 import 'package:h4/create.dart';
 import 'package:h4/utils/body_utils.dart';
-import 'package:h4/utils/request_utils.dart';
+import 'package:h4/utils/req_utils.dart';
+// import 'package:h4/utils/request_utils.dart';
 
 void main(List<String> arguments) async {
   var app = createApp(
     port: 5173,
-    onRequest: (event) => {},
-    afterResponse: (event) => {},
+    onRequest: (event) {
+      handleCors(event, origin: "https://example.re");
+    },
   );
 
   var router = createRouter();
@@ -19,10 +21,8 @@ void main(List<String> arguments) async {
 
   router.post("/vamos/:id/**", (event) async {
     var body = await readRequestBody(event);
-    print(body["map"]);
-    var header = getHeader(event, HttpHeaders.userAgentHeader);
-    var query = getQueryParams(event);
-    return [header, body, query, event.params];
+    var header = getRequestUrl(event);
+    return [header, body];
   });
 
   Future<String> unreliableFunction() async {

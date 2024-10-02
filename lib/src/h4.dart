@@ -220,11 +220,15 @@ class H4 {
 
         if (match != null) {
           handler = match[request.method];
+        } else {
+          // Return 404 Not found.
+          return404(request)(middlewares, null);
         }
 
-        // If we find no match for the request signature - 404.
-        if (handler == null || match == null) {
-          return404(request)(middlewares, null);
+        // If we find no match for the request method - 405 (Not allowed).
+        if (handler == null) {
+          print(match?.keys.join(','));
+          return405(request)(middlewares, null, match);
         }
 
         // We've found a match - handle the request.
@@ -260,7 +264,10 @@ typedef NotFoundHandler = dynamic Function(
     MiddlewareStack stack, Map<String, String>? params);
 
 NotFoundHandler return404(HttpRequest request) {
-  return (stack, params) {
+  return (
+    stack,
+    params,
+  ) {
     return defineEventHandler(
       (event) {
         event.statusCode = 404;
@@ -270,6 +277,35 @@ NotFoundHandler return404(HttpRequest request) {
           "statusCode": 404,
           "statusMessage": "Not found",
           "message": "Cannot ${event.method.toUpperCase()} - ${event.path}"
+        };
+      },
+      stack,
+      params,
+    )(request);
+  };
+}
+
+typedef MethodNotAllowedHandler = dynamic Function(
+    MiddlewareStack stack,
+    Map<String, String>? params,
+    Map<String, dynamic Function(H4Event)?>? match);
+
+MethodNotAllowedHandler return405(HttpRequest request) {
+  return (stack, params, match) {
+    return defineEventHandler(
+      (event) {
+        event.statusCode = 405;
+        setResponseHeader(event,
+            header: HttpHeaders.contentTypeHeader, value: 'application/json');
+
+        setResponseHeader(event,
+            header: HttpHeaders.allowHeader,
+            value: match?.keys.join(',') ?? "");
+        return {
+          "statusCode": 405,
+          "statusMessage": "Method Not Allowed",
+          "message":
+              "Cannot ${event.method.toUpperCase()} - ${event.path}. Reason: Method not allowed, ${match?.keys.join(',').toUpperCase()} available."
         };
       },
       stack,

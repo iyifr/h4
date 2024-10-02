@@ -22,6 +22,10 @@ String? getRequestHost(H4Event event) {
   return event.node["value"]?.headers.value(HttpHeaders.hostHeader);
 }
 
+String? getRequestUrl2(H4Event event) {
+  return event.node["value"]?.headers.value("Origin");
+}
+
 String? getRequestUrl(H4Event event) {
   return '${getRequestProtocol(event)}://${getRequestHost(event)}${event.path}';
 }
@@ -33,6 +37,14 @@ getRequestProtocol(H4Event event) {
 
 String? getRouterParams(H4Event event, {required String name}) {
   return event.params.containsKey(name) ? event.params[name] : null;
+}
+
+void handleCors(H4Event event, {String origin = "*", String methods = "*"}) {
+  event.node["value"]!.response.headers
+      .set(HttpHeaders.accessControlAllowOriginHeader, origin);
+
+  event.node["value"]!.response.headers
+      .set(HttpHeaders.accessControlAllowMethodsHeader, methods);
 }
 
 class FormData {
