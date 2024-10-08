@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:h4/create.dart';
+import 'package:h4/src/logger.dart';
 import 'package:mime/mime.dart';
 
 export 'package:h4/utils/req_utils.dart' hide handleMultipartFormdata, FormData;
@@ -119,6 +120,11 @@ Future<FormData> readFormData(dynamic event) async {
   final HttpRequest request = event.node["value"];
   final contentType = request.headers.contentType;
   var formData = FormData();
+
+  if (contentType?.mimeType == null) {
+    logger.warning("NO formdata fields in request body!");
+    throw CreateError(message: "No formdata fields found");
+  }
 
   if (contentType?.mimeType == 'multipart/form-data') {
     final boundary = contentType!.parameters['boundary'];

@@ -20,7 +20,7 @@ class Either<T, U> {
 
 void Function(String error, String? stackTrace, H4Event? event)
     defaultErrorMiddleware = (error, stackTrace, event) => logger.severe(
-        '$error\n $stackTrace Error occured while attempting ${event?.method.toUpperCase()} request at - ${event?.path}');
+        '$error\n$stackTrace Error occured while attempting ${event?.method.toUpperCase()} request at - ${event?.path}');
 
 /// A middleware function that takes an [H4Event] and has access to it's snapshot.
 typedef Middleware = void Function(H4Event event)?;

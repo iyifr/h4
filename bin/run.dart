@@ -10,9 +10,6 @@ import 'package:h4/utils/req_utils.dart';
 void main(List<String> arguments) async {
   var app = createApp(
     port: 5173,
-    onRequest: (event) {
-      handleCors(event, origin: "https://example.re");
-    },
   );
 
   var router = createRouter();
