@@ -1,5 +1,4 @@
 import 'package:h4/create.dart';
-import 'package:h4/utils/req_utils.dart';
 
 void main() async {
   var app = createApp(
