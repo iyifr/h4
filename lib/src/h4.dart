@@ -223,12 +223,17 @@ class H4 {
         } else {
           // Return 404 Not found.
           return404(request)(middlewares, null);
+          return;
         }
 
         // If we find no match for the request method - 405 (Not allowed).
         if (handler == null) {
-          print(match?.keys.join(','));
-          return405(request)(middlewares, null, match);
+          if (match.keys.length > 1) {
+            return405(request)(middlewares, null, match);
+            return;
+          }
+          return404(request)(middlewares, null);
+          return;
         }
 
         // We've found a match - handle the request.
@@ -305,7 +310,7 @@ MethodNotAllowedHandler return405(HttpRequest request) {
           "statusCode": 405,
           "statusMessage": "Method Not Allowed",
           "message":
-              "Cannot ${event.method.toUpperCase()} - ${event.path}. Reason: Method not allowed, ${match?.keys.join(',').toUpperCase()} available."
+              "Cannot ${event.method.toUpperCase()} - ${event.path}. Reason: Method not allowed."
         };
       },
       stack,

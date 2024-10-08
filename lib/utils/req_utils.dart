@@ -18,16 +18,20 @@ String? getRequestIp(H4Event event) {
   return ip;
 }
 
-/// **Get request host**
+/// **Get incoming request host**
 ///
 /// Either **http** or **https**
 String? getRequestHost(H4Event event) {
   return event.node["value"]?.headers.value(HttpHeaders.hostHeader);
 }
 
-/// Get the entire request URL.
-/// 
-/// Constructed with the protocol, host and path.
+/// #### Get the full request URL.
+///
+/// ```dart
+/// router.get("/home", (event) => {
+///   var url = getRequestUrl(event) // https://app-client-url.com/products
+/// })
+/// ```
 String? getRequestUrl(H4Event event) {
   return '${getRequestProtocol(event)}://${getRequestHost(event)}${event.path}';
 }

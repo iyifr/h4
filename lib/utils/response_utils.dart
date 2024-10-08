@@ -1,6 +1,8 @@
 import 'package:h4/src/event.dart';
 import 'dart:io';
 
+import 'package:h4/src/logger.dart';
+
 /// **Set the value of outgoing response header**
 ///
 /// Parameters:
@@ -10,7 +12,12 @@ import 'dart:io';
 ///
 setResponseHeader(H4Event event,
     {required String header, required String value}) {
-  event.node["value"]?.response.headers.set(header, value);
+  if (event.node["value"]?.headers.value(header) == null) {
+    event.node["value"]?.response.headers.set(header, value);
+  } else {
+    logger.warning("HTTP header $header, has already been set");
+    event.node["value"]?.response.headers.add(header, value);
+  }
 }
 
 /// **Get the outgoing response headers.**
