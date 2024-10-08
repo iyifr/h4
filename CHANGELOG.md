@@ -1,3 +1,11 @@
+### 0.3.1 (Patch)
+
+- **EXTENDED** `readFormData` utility to handle undefined formdata fields better.
+- **PATCHED** `setResponseHeader` utility to better handle immutable nature of http response
+  headers.
+- Documented some utilities better.
+- Entire library is now accessible from one import.
+
 ## 0.3.0 (Minor)
 
 - **NEW** Multiple Routers with `basePath`

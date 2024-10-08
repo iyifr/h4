@@ -8,6 +8,8 @@ Inspired by [unjs H3](https://h3.unjs.io).
 
 **This is a new project under active development**, production use is not advised.
 
+The docs site is still in construction🚧🚧 - [link](https://h4-tau.vercel.app)
+
 ## Features
 
 - **Lightweight**: H4 ships with a small core and a set of composable utilities.
