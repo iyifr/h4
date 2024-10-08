@@ -23,10 +23,10 @@ void main() async {
   var apiRouter = createRouter();
 
   app.use(router, basePath: '/');
-  app.use(apiRouter, basePath: '/api');
+  app.use(apiRouter, basePath: '/api'); 
 
   router.get("/vamos/:id/base/:studentId", (event) {
-    return getRouterParams(event, name: "id");
+    return getRouteParam(event, name: "id");
   });
 
   apiRouter.get("/signup", (event) async {
