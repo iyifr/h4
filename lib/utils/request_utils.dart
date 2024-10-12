@@ -10,9 +10,9 @@ import 'package:h4/src/event.dart';
 ///  ```dart
 ///
 ///  router.get('/foo', (event) {
-///   // Incoming path --> '/foo?ref=producthunt'
+///   // Incoming path --> '/foo?ref=product-hunt'
 ///   var res = getQueryParams(event)
-///   var incomingRef = res["ref"] // "producthunt"
+///   var incomingRef = res["ref"] // "product-hunt"
 /// });
 /// ```
 getQueryParams(H4Event event) {
@@ -55,9 +55,7 @@ String? getRequestHeader(H4Event event, String header) {
 }
 
 /// ### Get the request headers object.
-//////
-/// Parameters:
-/// - `event`: An `H4Event` instance containing the HTTP request.
+///
 ///
 /// Returns:
 /// The headers of the incoming HTTP request.
