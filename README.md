@@ -1,4 +1,4 @@
-![og](/lib/assets/H4-banne.png)
+![og](/assets/H4-banner.png)
 
 **A sleek and powerful HTTP framework that makes Dart API development a breeze**
 

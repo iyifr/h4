@@ -1,3 +1,6 @@
+### 0.3.2
+Fixed bug in `init` script in the Bootstrap CLI.
+
 ### 0.3.1 (Patch)
 
 - **EXTENDED** `readFormData` utility to handle undefined formdata fields better.
