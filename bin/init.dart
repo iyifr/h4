@@ -4,7 +4,6 @@ import 'dart:async';
 import 'dart:io';
 import 'package:console/console.dart';
 import 'dart:convert';
-import 'package:path/path.dart' as path;
 
 void main(List<String> arguments) async {
   if (!await _isH4Installed()) {
@@ -70,8 +69,6 @@ Future<void> _createAppFiles(String appName,
     Console.setBold(true);
     Console.write('\n\nInstalling necessary dependencies...\n'.toUpperCase());
     File mainFile;
-    File defaultFile =
-        File('lib/${path.basename(Directory.current.path)}.dart');
 
     if (inCurrentDir) {
       Process.runSync('dart', ['pub', 'add', 'h4'],
@@ -80,7 +77,6 @@ Future<void> _createAppFiles(String appName,
       Console.setBlink(false);
     } else {
       mainFile = File('$appName/lib/index.dart');
-      defaultFile = File('$appName/lib/$appName.dart');
       await runProcessInDirectory(appName, ['dart', 'pub', 'add', 'h4'])
           .then((value) => Console.setBlink(false));
     }
@@ -88,14 +84,17 @@ Future<void> _createAppFiles(String appName,
     Console.setBold(false);
     await _writeMainFile(mainFile);
 
-    if (await defaultFile.exists()) {
-      await defaultFile.delete();
+    if (File('$appName/lib/${appName.replaceAll('-', '_')}.dart')
+        .existsSync()) {
+      await File('$appName/lib/${appName.replaceAll('-', '_')}.dart').delete();
+    } else {
+      Console.write('---Failed to clear appName file');
     }
 
     Console.setBold(true);
     Console.write('\nH4 initialized successfully'.toUpperCase());
-  } catch (e) {
-    Console.write('\nFailed to create H4 app. Error: $e');
+  } catch (e, stacktrace) {
+    Console.write('\nFailed to create H4 app. Error: $e /n $stacktrace');
     return;
   }
 }
@@ -149,7 +148,7 @@ Future<String> _promptAppName() async {
       '\nEnter a name for your app (or press Enter to skip and set default): ');
   final name = stdin.readLineSync(encoding: utf8) ?? '';
   Console.resetAll();
-  return name.isNotEmpty ? name : 'my-app';
+  return name.isNotEmpty ? name : 'h4-server';
 }
 
 Future<void> _writeMainFile(File mainFile) async {

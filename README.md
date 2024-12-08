@@ -1,6 +1,7 @@
 ![og](/lib/assets/H4-banne.png)
-A sleek and powerful HTTP framework that makes Dart API development a breeze.
-  
+
+**A sleek and powerful HTTP framework that makes Dart API development a breeze**
+
 Inspired by [unjs H3](https://h3.unjs.io).
 
 **This is a new project under active development**, production use is not advised.
@@ -108,8 +109,8 @@ The client recieves this json payload -
 
 ```json
 {
- "status": 400,
- "message": "Womp Womp"
+	"status": 400,
+	"message": "Womp Womp"
 }
 ```
 
