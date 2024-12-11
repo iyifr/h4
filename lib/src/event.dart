@@ -121,6 +121,7 @@ class H4Event {
     // Handle non-async handler.
     _resolveRequest(this, handlerResult);
 
+    // Workaround for dart's lack of support for union types
     if (middlewares?['afterResponse'] != null) {
       if (middlewares?['afterResponse']?.left != null) {
         middlewares?['afterResponse']?.left!(this);

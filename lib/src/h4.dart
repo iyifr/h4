@@ -122,9 +122,6 @@ class H4 {
   /// is a function that takes an [H4Event] as input and returns a modified
   /// [H4Event].
   ///
-  /// The registered middleware function can be used to perform various tasks, such
-  /// as:
-  ///
   /// - Logging or monitoring requests
   /// - Validating or transforming request data
   /// - Adding headers or other metadata to the request
@@ -154,9 +151,6 @@ class H4 {
   /// - `String` representation of the error object
   /// - `String` representation of the stack trace
   /// - The [H4Event] that triggered the error (if available)
-  ///
-  /// This error handling function can be used to log, report, or handle errors in
-  /// a custom way within your application.
   ///
   /// Example usage:
   /// ```dart
@@ -281,7 +275,8 @@ NotFoundHandler return404(HttpRequest request) {
         return {
           "statusCode": 404,
           "statusMessage": "Not found",
-          "message": "Cannot ${event.method.toUpperCase()} - ${event.path}"
+          "message":
+              "Cannot perform ${event.method.toUpperCase()} request at ${event.path}, PATH not found."
         };
       },
       stack,
@@ -310,7 +305,7 @@ MethodNotAllowedHandler return405(HttpRequest request) {
           "statusCode": 405,
           "statusMessage": "Method Not Allowed",
           "message":
-              "Cannot ${event.method.toUpperCase()} - ${event.path}. Reason: Method not allowed."
+              "Cannot perform ${event.method.toUpperCase()} request at ${event.path}\n Reason: Method not allowed."
         };
       },
       stack,

@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:h4/create.dart';
 
 void main() async {
@@ -26,11 +29,6 @@ void main() async {
 
     var username = formData.get('username');
     var password = formData.get('password');
-
-    print(getRequestIp(event));
-
-    // userService.signup(username, password);
-    event.statusCode = 201;
 
     return 'Hi from /api with $username, $password';
   });

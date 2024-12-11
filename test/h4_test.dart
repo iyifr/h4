@@ -5,7 +5,6 @@ import 'package:dio/dio.dart';
 import 'package:h4/create.dart';
 import 'package:h4/src/h4.dart';
 import 'package:h4/src/router.dart';
-import 'package:h4/utils/body_utils.dart';
 import 'package:h4/utils/request_utils.dart';
 import 'package:test/test.dart';
 
