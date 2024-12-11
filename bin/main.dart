@@ -1,6 +1,3 @@
-import 'dart:convert';
-import 'dart:io';
-
 import 'package:h4/create.dart';
 
 void main() async {
@@ -31,5 +28,11 @@ void main() async {
     var password = formData.get('password');
 
     return 'Hi from /api with $username, $password';
+  });
+
+  apiRouter.post("/upload", (event) async {
+    var files = await readFiles(event, fieldName: 'file', customFilePath: 'uploads');
+    setResponseHeader(event, header: 'Content-Type', value: 'application/json');
+    return files;
   });
 }

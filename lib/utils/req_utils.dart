@@ -128,7 +128,7 @@ Future<FormData> handleMultipartFormdata(
     if (fieldName != null) {
       if (contentType != null || filename != null) {
         // Stream file to temporary storage
-        final fileInfo = await _streamToStorage(part, filename);
+        final fileInfo = await _streamToStorage(part, filename, null);
 
         Map<String, dynamic> fieldData = {
           'path': fileInfo['path'],
@@ -189,19 +189,30 @@ String detectEncoding(Uint8List bytes) {
   return 'UTF-8';
 }
 
-Future<Map<String, dynamic>> _streamToStorage(
-    Stream<List<int>> dataStream, String? originalFilename) async {
+Future<Map<String, dynamic>> _streamToStorage(Stream<List<int>> dataStream,
+    String? originalFilename, String? customFilePath) async {
   // Create unique filename to avoid collisions
   final timestamp = DateTime.now().millisecondsSinceEpoch;
   final randomId =
       DateTime.now().microsecondsSinceEpoch.toString().substring(8);
   final safeFilename =
       originalFilename?.replaceAll(RegExp(r'[^a-zA-Z0-9.-]'), '_') ?? 'unnamed';
-  final filename = '${timestamp}_${randomId}_$safeFilename';
+  final filename = '$timestamp$randomId$safeFilename';
 
-  // Get system temp directory
-  final tempDir = Directory.systemTemp;
-  final filePath = path.join(tempDir.path, filename);
+  // Use custom path if provided, otherwise use system temp directory
+  final String filePath;
+  if (customFilePath != null) {
+    // Create directory if it doesn't exist
+    final directory = Directory(customFilePath);
+    if (!await directory.exists()) {
+      await directory.create(recursive: true);
+    }
+    filePath = path.join(customFilePath, filename);
+  } else {
+    final tempDir = Directory.systemTemp;
+    filePath = path.join(tempDir.path, filename);
+  }
+
   final file = File(filePath);
 
   // Stream metrics
@@ -233,5 +244,56 @@ Future<Map<String, dynamic>> _streamToStorage(
       await file.delete();
     }
     throw CreateError(message: 'Failed to save file: ${e.toString()}');
+  }
+}
+
+Future<List<Map<String, dynamic>>?> readFiles(H4Event event,
+    {required String fieldName, String? customFilePath}) async {
+  final HttpRequest request = event.node["value"]!;
+  final contentType = request.headers.contentType;
+
+  if (contentType?.mimeType != 'multipart/form-data') {
+    throw CreateError(
+        message: 'Files can only be uploaded using multipart/form-data');
+  }
+
+  final boundary = contentType!.parameters['boundary'];
+  if (boundary == null) {
+    throw CreateError(message: 'Missing boundary in multipart/form-data');
+  }
+
+  final mimeTransformer = MimeMultipartTransformer(boundary);
+  final parts = request.cast<List<int>>().transform(mimeTransformer);
+  List<Map<String, dynamic>> files = [];
+
+  try {
+    await for (final part in parts) {
+      final headers = part.headers;
+      final contentType = headers['content-type'];
+      final contentDisposition = headers['content-disposition'];
+      final nameMatch =
+          RegExp(r'name="([^"]*)"').firstMatch(contentDisposition ?? '');
+      final currentFieldName = nameMatch?.group(1);
+      final filenameMatch =
+          RegExp(r'filename="([^"]*)"').firstMatch(contentDisposition ?? '');
+      final filename = filenameMatch?.group(1);
+
+      // Only process if it matches the requested fieldName and has a filename
+      if (currentFieldName == fieldName && filename != null) {
+        final fileInfo = await _streamToStorage(part, filename, customFilePath);
+        files.add({
+          'path': fileInfo['path'],
+          'mimeType': contentType,
+          'originalname': filename,
+          'fieldName': fieldName,
+          'size': fileInfo['size'],
+          'tempFilename': fileInfo['tempFilename'],
+        });
+      }
+    }
+
+    return files.isEmpty ? null : files;
+  } catch (e) {
+    throw CreateError(message: 'Failed to read files: ${e.toString()}');
   }
 }
