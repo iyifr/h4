@@ -217,4 +217,41 @@ void main() {
       await uploadDir.delete(recursive: true);
     }
   });
+
+  test('Reads normal formdata objects', () async {
+    router.post('/formdata', (event) async {
+      var formData = await readFormData(event);
+      return {
+        'name': formData.get('name'),
+        'age': formData.get('age'),
+        'hobbies': formData.getAll('hobbies'),
+        'address': {
+          'street': formData.get('address.street'),
+          'city': formData.get('address.city')
+        }
+      };
+    });
+
+    final formData = dio_form_data.FormData.fromMap({
+      'name': 'John Doe',
+      'age': '30',
+      'hobbies': ['reading', 'gaming', 'coding'],
+      'address.street': '123 Main St',
+      'address.city': 'New York'
+    });
+
+    final response = await dio.post('/formdata',
+        data: formData,
+        options: Options(
+          headers: {'content-type': 'multipart/form-data'},
+        ));
+
+    var data = json.decode(response.data);
+
+    expect(data['name'], equals('John Doe'));
+    expect(data['age'], equals('30'));
+    expect(data['hobbies'], containsAll(['reading', 'gaming', 'coding']));
+    expect(data['address']['street'], equals('123 Main St'));
+    expect(data['address']['city'], equals('New York'));
+  });
 }
