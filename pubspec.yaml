@@ -1,6 +1,6 @@
 name: h4
-description: A minimal framework for building elegant server applications.
-version: 0.3.2
+description: A ligthweight, loosely opinionated http framework for dart.
+version: 0.4.0
 repository: https://github.com/iyifr/h4
 
 environment:

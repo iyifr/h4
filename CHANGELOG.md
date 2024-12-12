@@ -1,5 +1,34 @@
+## 0.4.0 (Minor)
+
+- **NEW** `readFiles` utility to handle file uploads.
+
+```dart
+var files = await readFiles(event, fieldName: 'file', customFilePath: 'uploads');
+// files is a List<Map<String, dynamic>> containing the info of the files uploaded.
+// Example:
+// [
+//   {
+//     'path': 'uploads/test.txt',
+//     'mimeType': 'text/plain',
+//     'originalname': 'test.txt',
+//     'fieldName': 'file',
+//     'size': 17,
+//     'tempFilename': 'test.txt'
+//   }
+// ]
+
+// EXAMPLE HANDLER.
+router.post("/upload", (event) async {
+  var files = await readFiles(event, fieldName: 'file', customFilePath: 'uploads');
+  return files;
+});
+```
+
+- **PATCHED** `readFiles` utility to handle file uploads better.
+
 ### 0.3.2
-Fixed bug in `init` script in the Bootstrap CLI.
+
+- **PATCHED** Fixed bug in `init` script in the Bootstrap CLI.
 
 ### 0.3.1 (Patch)
 

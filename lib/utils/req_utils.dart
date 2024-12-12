@@ -243,7 +243,7 @@ Future<Map<String, dynamic>> _streamToStorage(Stream<List<int>> dataStream,
     if (await file.exists()) {
       await file.delete();
     }
-    throw CreateError(message: 'Failed to save file: ${e.toString()}');
+    throw CreateError(message: 'Failed to save file on disk: ${e.toString()}');
   }
 }
 
@@ -291,9 +291,9 @@ Future<List<Map<String, dynamic>>?> readFiles(H4Event event,
         });
       }
     }
-
     return files.isEmpty ? null : files;
   } catch (e) {
-    throw CreateError(message: 'Failed to read files: ${e.toString()}');
+    throw CreateError(
+        message: 'Failed to read files from formdata: ${e.toString()}');
   }
 }

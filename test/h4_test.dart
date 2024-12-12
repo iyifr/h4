@@ -1,12 +1,13 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:dio/dio.dart';
-
+import 'package:dio/src/form_data.dart' as dio_form_data;
 import 'package:h4/create.dart';
-import 'package:h4/src/h4.dart';
 import 'package:h4/src/router.dart';
 import 'package:h4/utils/request_utils.dart';
 import 'package:test/test.dart';
+import 'package:h4/src/h4.dart';
 
 void main() {
   H4? app;
@@ -21,6 +22,7 @@ void main() {
 
   tearDownAll(() async {
     await app?.close();
+    print("Server closed");
   });
 
   test('Initializes server correctly', () async {
@@ -177,6 +179,42 @@ void main() {
 
     for (final test in testCases) {
       expect(regex.hasMatch(test), true);
+    }
+  });
+
+  test('Reads files from formdata', () async {
+    router.post('/upload', (event) async {
+      var files =
+          await readFiles(event, fieldName: 'file', customFilePath: 'uploads');
+      return files;
+    });
+
+    final formData = dio_form_data.FormData.fromMap({
+      'file':
+          await MultipartFile.fromFile('assets/test.txt', filename: 'test.txt'),
+    });
+
+    final response = await dio.post('/upload',
+        data: formData,
+        options: Options(
+          headers: {'content-type': 'multipart/form-data'},
+        ));
+
+    var data = json.decode(response.data);
+
+    expect(data, isA<List>());
+    expect(data[0]['originalname'], 'test.txt');
+    expect(data[0]['fieldName'], 'file');
+    expect(data[0]['mimeType'], 'application/octet-stream');
+    expect(data[0]['path'], contains('uploads'));
+    expect(data[0]['size'], equals(17));
+  });
+
+  tearDown(() async {
+    // Clean up uploaded files and folders after each test
+    final uploadDir = Directory('uploads');
+    if (await uploadDir.exists()) {
+      await uploadDir.delete(recursive: true);
     }
   });
 }
