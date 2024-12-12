@@ -5,10 +5,11 @@ import 'dart:typed_data';
 
 import 'package:h4/create.dart';
 import 'package:h4/src/logger.dart';
+import 'package:h4/utils/formdata.dart';
 import 'package:mime/mime.dart';
 import 'package:path/path.dart' as path;
 
-export 'package:h4/utils/req_utils.dart' hide handleMultipartFormdata, FormData;
+export 'package:h4/utils/req_utils.dart' hide handleMultipartFormdata;
 
 String? getRequestIp(H4Event event) {
   var ip = event.node["value"]?.headers
@@ -54,33 +55,6 @@ void handleCors(H4Event event, {String origin = "*", String methods = "*"}) {
 
   event.node["value"]!.response.headers
       .set(HttpHeaders.accessControlAllowMethodsHeader, methods);
-}
-
-class FormData {
-  final Map<String, List<String>> _data = {};
-
-  void append(String name, dynamic value) {
-    _data.putIfAbsent(name, () => []).add(value);
-  }
-
-  log() {
-    print(_data);
-  }
-
-  @override
-  String toString() {
-    return _data.toString();
-  }
-
-  dynamic get(String name) {
-    final values = _data[name];
-    var result = values?.isNotEmpty == true ? values!.first : null;
-    return result;
-  }
-
-  List<dynamic>? getAll(String name) {
-    return _data[name];
-  }
 }
 
 Future<FormData> readFormData(dynamic event) async {

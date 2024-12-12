@@ -8,6 +8,7 @@ import 'package:h4/src/router.dart';
 import 'package:h4/utils/request_utils.dart';
 import 'package:test/test.dart';
 import 'package:h4/src/h4.dart';
+import 'package:h4/utils/formdata.dart' as h4_formdata;
 
 void main() {
   H4? app;
@@ -253,5 +254,62 @@ void main() {
     expect(data['hobbies'], containsAll(['reading', 'gaming', 'coding']));
     expect(data['address']['street'], equals('123 Main St'));
     expect(data['address']['city'], equals('New York'));
+  });
+
+  test('FormData implementation follows spec', () {
+    var formData = h4_formdata.FormData();
+
+    // Test append and get
+    formData.append('name', 'John Doe');
+    expect(formData.get('name'), equals('John Doe'));
+    expect(formData.has('name'), isTrue);
+
+    // Test multiple values via append
+    formData.append('hobbies', 'reading');
+    formData.append('hobbies', 'gaming');
+    formData.append('hobbies', 'coding');
+    var hobbies = formData
+        .entries()
+        .firstWhere((e) => e.key == 'hobbies')
+        .value
+        .map((e) => e.value)
+        .toList();
+    expect(hobbies, containsAll(['reading', 'gaming', 'coding']));
+
+    // Test set (should replace existing values)
+    formData.set('hobbies', 'swimming');
+    expect(formData.get('hobbies'), equals('swimming'));
+    hobbies = formData
+        .entries()
+        .firstWhere((e) => e.key == 'hobbies')
+        .value
+        .map((e) => e.value)
+        .toList();
+    expect(hobbies.length, equals(1));
+
+    // Test delete
+    formData.delete('name');
+    expect(formData.has('name'), isFalse);
+    expect(formData.get('name'), isNull);
+
+    // Test keys and values
+    formData.set('age', '25');
+    formData.set('city', 'New York');
+    expect(formData.keys(), containsAll(['hobbies', 'age', 'city']));
+    expect(formData.values().length, equals(3));
+
+    // Test entries
+    var entries = formData.entries();
+    expect(entries.length, equals(3));
+    var ageEntry = entries.firstWhere((e) => e.key == 'age');
+    expect(ageEntry.value.first.value, equals('25'));
+
+    // Test with file metadata
+    formData.append('file', 'file-content',
+        filename: 'test.txt', contentType: 'text/plain');
+    var fileEntry =
+        formData.entries().firstWhere((e) => e.key == 'file').value.first;
+    expect(fileEntry.filename, equals('test.txt'));
+    expect(fileEntry.contentType, equals('text/plain'));
   });
 }
