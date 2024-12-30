@@ -23,6 +23,7 @@ void Function(String error, String? stackTrace, H4Event? event)
         '$error\n$stackTrace Error occured while attempting ${event?.method.toUpperCase()} request at - ${event?.path}');
 
 /// A middleware function that takes an [H4Event] and has access to it's snapshot.
+/// Can also
 typedef Middleware = void Function(H4Event event)?;
 
 /// The [ErrorHandler] is used to process and potentially report errors that occur
@@ -37,6 +38,7 @@ typedef Middleware = void Function(H4Event event)?;
 ///
 typedef ErrorHandler = void Function(String, String?, H4Event?);
 
+// Workaround for union types.
 typedef MiddlewareStack = Map<String, Either<Middleware?, ErrorHandler?>?>?;
 
 class H4 {
@@ -75,11 +77,11 @@ class H4 {
     bool autoStart = true,
     this.middlewares,
   }) {
-    initLogger();
-
     if (autoStart) {
       start(port: port);
     }
+
+    initLogger();
   }
 
   /// Initializes the server on an available localhost port and starts listening for requests.
@@ -109,7 +111,7 @@ class H4 {
     await server?.close(force: force);
   }
 
-  /// Add a [H4Router] to the app instance for mapping requests.
+  /// Add a [H4Router] to the app instance for mapping requests to a different url.
   void use(H4Router router, {String basePath = '/'}) {
     routeStack[basePath] = router;
     this.router = router;
@@ -170,7 +172,7 @@ class H4 {
   _bootstrap() {
     server!.listen((HttpRequest request) {
       if (routeStack.values.isEmpty) {
-        logger.warning("No router instances were found.");
+        logger.warning("No router instances found.");
         return404(request)(middlewares, null);
         return;
       }

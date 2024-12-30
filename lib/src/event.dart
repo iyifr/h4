@@ -12,6 +12,7 @@ import 'package:h4/src/logger.dart';
 class H4Event {
   Map<String, String> params;
   Map<String, dynamic> context;
+  dynamic eventResponse;
 
   /// The HTTP request that triggered the event.
   ///
@@ -23,6 +24,7 @@ class H4Event {
 
   H4Event(this._request)
       : params = {},
+        eventResponse = null,
         context = {
           'path': _request.uri.path,
           'query_params': _request.uri.queryParameters,
@@ -87,11 +89,14 @@ class H4Event {
       case 'json':
         headers.add(HttpHeaders.contentTypeHeader, 'application/json');
         break;
+
       case 'null':
         _request.response.statusCode = 204;
         break;
+
       default:
         logger.warning('Invalid response format: $type');
+        break;
     }
   }
 
@@ -147,6 +152,8 @@ class H4Event {
   }
 
   _resolveRequest(H4Event event, handlerResult) {
+    event.eventResponse = handlerResult;
+
     // ignore: type_check_with_null
     if (handlerResult is Null) {
       event.statusCode = 204;

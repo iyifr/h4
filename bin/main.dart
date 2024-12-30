@@ -8,7 +8,7 @@ void main() async {
       event.context["user"] = 'Ogunlepon';
       print(getRequestUrl(event));
     },
-    afterResponse: (event) => {},
+    afterResponse: (event) => {print(event.eventResponse)},
   );
 
   var router = createRouter();
@@ -31,7 +31,8 @@ void main() async {
   });
 
   apiRouter.post("/upload", (event) async {
-    var files = await readFiles(event, fieldName: 'file', customFilePath: 'uploads');
+    var files =
+        await readFiles(event, fieldName: 'file', customFilePath: 'uploads');
     setResponseHeader(event, header: 'Content-Type', value: 'application/json');
     return files;
   });
