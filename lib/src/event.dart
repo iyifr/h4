@@ -55,10 +55,6 @@ class H4Event {
   /// You cannot mutate the request directly.
   Map<String, HttpRequest> get node => {'value': _request};
 
-  _isHeaderSet(String header) {
-    return _request.response.headers[header] == null ? false : true;
-  }
-
   /// Sets the response format to the specified [type].
   ///
   /// The supported types are:
