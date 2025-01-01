@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
@@ -136,7 +135,7 @@ void main() {
         options: Options(
           headers: {'content-type': 'application/json'},
         ));
-    expect(jsonDecode(req.data), {"hi": 12});
+    expect(req.data, {"hi": 12});
   });
 
   test('Correctly parses query parameters', () async {
@@ -146,7 +145,7 @@ void main() {
 
     final response = await dio.get('/body?query=iyimide&answer=laboss');
 
-    expect(jsonDecode(response.data), {"query": "iyimide", "answer": "laboss"});
+    expect(response.data, {"query": "iyimide", "answer": "laboss"});
   });
 
   test('Regex pattern for routes', () {
@@ -201,7 +200,7 @@ void main() {
           headers: {'content-type': 'multipart/form-data'},
         ));
 
-    var data = json.decode(response.data);
+    var data = response.data;
 
     expect(data, isA<List>());
     expect(data[0]['originalname'], 'test.txt');
@@ -247,7 +246,7 @@ void main() {
           headers: {'content-type': 'multipart/form-data'},
         ));
 
-    var data = json.decode(response.data);
+    var data = response.data;
 
     expect(data['name'], equals('John Doe'));
     expect(data['age'], equals('30'));
