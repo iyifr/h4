@@ -3,9 +3,11 @@ import 'dart:io';
 import 'package:h4/src/event.dart';
 import 'package:h4/src/h4.dart';
 
-/// A function that takes the following parameters
-/// - A [EventHandler] event handler,
-/// - A params object that contains the request parameters (if any).
+/// An internal function that interfaces between the incoming HTTP requests and the H4 interface.
+/// 
+/// It takes the following arguments.
+/// - A [EventHandler] event handler
+/// - A params object that contains the request parameters (if any)
 /// - An optional `onRequest` middleware that runs before constructing a response
 ///
 /// It returns a function that is called with a HTTP request, it's job is to write a response and close the request.
@@ -30,18 +32,14 @@ Function(HttpRequest) defineEventHandler(
       }
     }
 
-    // Call the handler with the event.
     var handlerResult = handler(event);
     event.respond(handlerResult, middlewares: middlewares);
   };
 }
 
-/// A function type alias for event handlers in the H4 framework.
+/// A type alias for event handlers in the H4 framework.
 ///
-/// The `EventHandler` type represents a function that takes an [H4Event] as input and
-/// returns a `T`, where `T` is the return type of the event handler.
-///
-/// It represents the type of data you want to send back to the client.
-///
-/// Only serializable objects are appropriate return types for handlerss
+/// `EventHandlers` are used to respond to http request events which are denoted in H4 by `H4Event`.
+/// 
+/// Event handlers are generic.
 typedef EventHandler<T> = T Function(H4Event event);

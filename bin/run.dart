@@ -41,4 +41,8 @@ void main(List<String> arguments) async {
   router.get("/vamos", (event) {
     throw CreateError(message: 'A grave error happened');
   });
+
+  router.get('/hi', (event) {
+    return [13];
+  });
 }

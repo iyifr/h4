@@ -1,17 +1,16 @@
 ![og](/assets/H4-banner.png)
 
-**A sleek and powerful HTTP framework that makes Dart API development a breeze**
+**A lightweight web framework for dart**
 
-Inspired by [unjs H3](https://h3.unjs.io).
+Inspired by [unjs H3](https://h3.unjs.io), built with familiar API's and a functional style. 
 
 **This is a new project under active development**, production use is not advised.
 
-The docs site is still in construction🚧🚧 - [link](https://h4-tau.vercel.app)
+The documentation site is a WIP - [link](https://h4-tau.vercel.app)
 
 ## Features
-
 - **Lightweight**: H4 ships with a small core and a set of composable utilities.
-- **Middleware**: H4 comes with `onRequest` and `onError` middleware.
+- **Middleware**: H4 comes with `onRequest`,`onError` and `afterResponse` middleware.
 - **Generic Handlers**: Specify the return type of your handler functions.
 
 ## Getting Started
@@ -65,6 +64,8 @@ Specify the return type of your handlers
 
 ```dart
 router.get<bool>("/25/**", (event) => true);
+router.get<int>("/42/**", (event) => 42);
+router.get<String>("/hello/**", (event) => "Hello world");
 ```
 
 ### Global Hooks
@@ -128,7 +129,7 @@ router.get('/users/:id', (event) {
 ### Wildcard Routing
 
 ```dart
-// Matches 'articles/page' and '/articles/otherPage' but not 'articles/page/otherPage'
+// Matches 'articles/page' and '/articles/otherPage' but not 'articles/page/subPage'
 router.get('/articles/*', (event) {
  final path = event.path;
  return 'The tea is teaing!!'
@@ -136,7 +137,7 @@ router.get('/articles/*', (event) {
 ```
 
 ```dart
-// Matches 'articles/foo/bar' and 'articles/rice/eba/beans'
+// Matches 'articles/foo/bar' and 'articles/page/subPage/subSubPage'
 router.get('/articles/**', (event) {
  final path = event.path;
  return 'The tea is teaing!!'
@@ -172,8 +173,8 @@ router.post("/vamos", (event) async {
 
 ### Contributing
 
-A good first PR would be helping me improve the test coverage of this library, or adding one of the
-utilities listed [here](https://h3.unjs.io/utils).
+A great first PR would be improve the test coverage of this library, or adding a helpful util, for
+inspiration see [here](https://h3.unjs.io/utils).
 
 ### Running tests
 
@@ -185,5 +186,4 @@ dart test
 
 ## Code of Conduct.
 
-Show respect and consideration for others when creating issues and contributing to the library. Only
-good vibes!
+Be cool and calm.

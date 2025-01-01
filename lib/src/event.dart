@@ -5,10 +5,9 @@ import 'package:h4/src/error_middleware.dart';
 import 'package:h4/src/h4.dart';
 import 'package:h4/src/logger.dart';
 
-/// Represents an event in the H4 framework.
-///
-/// The `H4Event` class encapsulates an HTTP request and provides methods and properties
-/// to interact with the request and generate the appropriate response.
+/// Represents an `HTTP request` event in the H4 framework.
+
+// DOC: The H4Event class encapsulates an incoming HTTP request and adds necessary API's to interface with the request and write responses to the client.
 class H4Event {
   Map<String, String> params;
   Map<String, dynamic> context;
@@ -73,10 +72,6 @@ class H4Event {
   void setResponseFormat(String type) {
     var headers = _request.response.headers;
 
-    if (_isHeaderSet(HttpHeaders.contentTypeHeader)) {
-      return;
-    }
-
     switch (type) {
       case 'html':
         headers.add(HttpHeaders.contentTypeHeader, 'text/html');
@@ -100,10 +95,10 @@ class H4Event {
     }
   }
 
-  /// Writes the provided [handlerResult] to the HTTP response and closes the response.
+  /// Sends the HTTP response based on the [handlerResult] and terminates the response stream.
   ///
-  /// If the [handlerResult] is `null`, the response will be closed without writing any content.
-  /// The [handled] flag is set to `true` after the response is sent.
+  /// If [handlerResult] is `null`, the response is closed without sending any content, and the status code is set to 204 (No Content).
+  /// After the response is sent, the [handled] flag is set to `true`, indicating that the request has been fully processed.
   void respond(dynamic handlerResult, {required MiddlewareStack middlewares}) {
     if (_handled) {
       return;
@@ -144,9 +139,7 @@ class H4Event {
     _writeToClient(value);
   }
 
-  /// Will close the response `IOSink` and complete the request.
-  ///
-  /// Avoid calling this in handlers and middleware.
+  /// Will close the native response `IOSink` and stop the response stream.
   void _shutDown() {
     _request.response.close();
   }
