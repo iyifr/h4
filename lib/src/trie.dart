@@ -62,8 +62,9 @@ class Trie {
     return currNode?.handlers;
   }
 
+  // Search route trie for parameterized routes.
   matchParamRoute(List<String> pathPieces) {
-    Map<String, EventHandler?>? laHandler;
+    Map<String, EventHandler?>? eventHandler;
 
     if (pathPieces.isEmpty) {
       return root.handlers;
@@ -78,7 +79,7 @@ class Trie {
         currNode?.children.forEach((key, value) {
           if ((key.startsWith(":") || key.startsWith("*")) && value.isLeaf) {
             if (index == pathPieces.length - 1) {
-              laHandler = value.handlers;
+              eventHandler = value.handlers;
             }
           }
 
@@ -89,25 +90,23 @@ class Trie {
             var prev = maps["prev"];
 
             if (result?["leaf"] == pathPieces.lastOrNull) {
-              laHandler = result?["handlers"];
+              eventHandler = result?["handlers"];
             }
 
             if (result?["leaf"] != null) {
               if (result!["leaf"].startsWith(":")) {
                 if (pathPieces[pathPieces.length - 2] == prev?["key"]) {
-                  laHandler = result["handlers"];
+                  eventHandler = result["handlers"];
                 }
               }
             }
           }
         });
       }
-      if (laHandler != null) {
-        break;
-      }
+      if (eventHandler != null) break;
       currNode = currNode?.children[pathPiece];
     }
-    return laHandler;
+    return eventHandler;
   }
 
   Map<String, String> getParams(List<String> pathPieces) {
@@ -130,7 +129,7 @@ class Trie {
   }
 
   matchWildCardRoute(List<String> pathPieces) {
-    Map<String, EventHandler?>? laHandler;
+    Map<String, EventHandler?>? eventHandler;
 
     if (pathPieces.isEmpty) {
       return root.handlers;
@@ -142,18 +141,18 @@ class Trie {
       if (currNode?.children[pathPiece] == null) {
         currNode?.children.forEach((key, value) {
           if (key.startsWith("**") && value.isLeaf) {
-            laHandler = value.handlers;
+            eventHandler = value.handlers;
           } else {
             var result = deepTraverse(value.children)["result"];
             if (result?["leaf"] == '**') {
-              laHandler = result?["handlers"];
+              eventHandler = result?["handlers"];
             }
           }
         });
       }
       currNode = currNode?.children[pathPiece];
     }
-    return laHandler;
+    return eventHandler;
   }
 }
 

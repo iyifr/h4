@@ -4,9 +4,9 @@
 
 Inspired by [unjs H3](https://h3.unjs.io), built with familiar API's and a functional style. 
 
-**This is a new project under active development**, production use is not advised.
+**This is a new project under active development**, there are tests, but it could break in unexpected ways.
 
-The documentation site is a WIP - [link](https://h4-tau.vercel.app)
+The official documentation is a WIP - [link](https://h4-tau.vercel.app)
 
 ## Getting Started
 Add H4 to your `pubspec.yaml`:
@@ -54,7 +54,6 @@ void main() {
 
 
 ### Global Hooks
-
 You can register global hooks:
 
 - `onRequest`
@@ -83,7 +82,7 @@ You can define parameters in your routes using `:` prefix:
 ```dart
 router.get('/users/:id', (event) {
  final userId = event.params['id'];
- return 'User $userId'
+ return 'User with id: $userId'
 });
 ```
 

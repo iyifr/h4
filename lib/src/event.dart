@@ -95,7 +95,9 @@ class H4Event {
   ///
   /// If [handlerResult] is `null`, the response is closed without sending any content, and the status code is set to 204 (No Content).
   /// After the response is sent, the [handled] flag is set to `true`, indicating that the request has been fully processed.
-  void respond(dynamic handlerResult, {required MiddlewareStack middlewares}) {
+  void respond(dynamic handlerResult,
+      {required void Function(String, String?, H4Event?)? onError,
+      required Middleware? afterResponse}) {
     if (_handled) {
       return;
     }
@@ -105,8 +107,7 @@ class H4Event {
       handlerResult
           .then((value) => _resolveRequest(this, value))
           .onError((error, stackTrace) {
-        defineErrorHandler(
-            middlewares?['onError']?.right ?? defaultErrorMiddleware,
+        defineErrorHandler(onError ?? defaultErrorMiddleware,
             params: params,
             error: error.toString(),
             trace: stackTrace)(_request);
@@ -117,11 +118,8 @@ class H4Event {
     // Handle non-async handler.
     _resolveRequest(this, handlerResult);
 
-    // Workaround for dart's lack of support for union types
-    if (middlewares?['afterResponse'] != null) {
-      if (middlewares?['afterResponse']?.left != null) {
-        middlewares?['afterResponse']?.left!(this);
-      }
+    if (afterResponse != null) {
+      afterResponse(this);
     }
   }
 

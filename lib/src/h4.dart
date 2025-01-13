@@ -161,7 +161,7 @@ class H4 {
   ///   logErrorToService(error, stackTrace, event);
   /// });
   /// ```
-  @Deprecated('Set your middelwares in the app init function instead')
+  @Deprecated('Set your middlewares in the app init function instead')
   void onError(
     void Function(String error, String? stackTrace, H4Event? event)
         errorHandler,
@@ -222,9 +222,9 @@ class H4 {
           return;
         }
 
-        // If we find no match for the request method - 405 (Not allowed).
         if (handler == null) {
-          if (match.keys.length > 1) {
+          if (match.keys.isNotEmpty) {
+            // If we find no match for the request method, but other request methods are present - 405 (Not allowed).
             return405(request)(middlewares, null, match);
             return;
           }
@@ -278,7 +278,7 @@ NotFoundHandler return404(HttpRequest request) {
           "statusCode": 404,
           "statusMessage": "Not found",
           "message":
-              "Cannot perform ${event.method.toUpperCase()} request at ${event.path}, PATH not found."
+              "Failed to ${event.method.toUpperCase()} at ${event.path}, PATH not found."
         };
       },
       stack,
@@ -307,7 +307,7 @@ MethodNotAllowedHandler return405(HttpRequest request) {
           "statusCode": 405,
           "statusMessage": "Method Not Allowed",
           "message":
-              "Cannot perform ${event.method.toUpperCase()} request at ${event.path}\n Reason: Method not allowed."
+              "Failed to ${event.method.toUpperCase()} ${event.path}, Method not allowed."
         };
       },
       stack,

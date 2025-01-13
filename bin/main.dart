@@ -2,7 +2,7 @@ import 'package:h4/create.dart';
 
 void main() async {
   var app = createApp(
-    port: 5173,
+    port: 3000,
     onRequest: (event) {
       // PER REQUEST local state😻
       event.context["user"] = 'Ogunlepon';
@@ -16,6 +16,10 @@ void main() async {
 
   app.use(router, basePath: '/');
   app.use(apiRouter, basePath: '/api');
+
+  router.get('/hello', (event) {
+    return {'hello': 'world'};
+  });
 
   router.get("/vamos/:id/base/:studentId", (event) {
     return getRouteParam(event, name: "studentId");
