@@ -1,4 +1,12 @@
-## 0.4.0 (Minor)
+## 0.4.1 (Patch Release)
+
+- **PATCHED** Improved error handling in the `readFiles` utility for better file upload management.
+- **PATCHED** Updated documentation for the `readFormData` utility to clarify usage and examples.
+- **PATCHED** Fixed minor bugs in the router handling for better route matching.
+- **UPDATED** Dependencies in `pubspec.yaml` to ensure compatibility with the latest Dart SDK.
+- **ADDED** New test cases in `h4_test.dart` to cover edge cases for file uploads and form data handling.
+
+## 0.4.0 (Minor release)
 
 - **NEW** `readFiles` utility to handle file uploads.
 
