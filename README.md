@@ -8,13 +8,7 @@ Inspired by [unjs H3](https://h3.unjs.io), built with familiar API's and a funct
 
 The documentation site is a WIP - [link](https://h4-tau.vercel.app)
 
-## Features
-- **Lightweight**: H4 ships with a small core and a set of composable utilities.
-- **Middleware**: H4 comes with `onRequest`,`onError` and `afterResponse` middleware.
-- **Generic Handlers**: Specify the return type of your handler functions.
-
 ## Getting Started
-
 Add H4 to your `pubspec.yaml`:
 
 ```yaml
@@ -58,15 +52,6 @@ void main() {
 }
 ```
 
-### Generic handlers
-
-Specify the return type of your handlers
-
-```dart
-router.get<bool>("/25/**", (event) => true);
-router.get<int>("/42/**", (event) => 42);
-router.get<String>("/hello/**", (event) => "Hello world");
-```
 
 ### Global Hooks
 
@@ -90,30 +75,6 @@ logging, error handling, etc.
  app.use(router);
 ```
 
-### Error Handling
-
-You can throw a create error Exception that will terminate the request and send a 400 - Bad Request
-response
-
-```dart
-router.get('/error', (event) async {
- try {
-  // Code that could fail.
- }
- catch(e) {
-   throw CreateError(message: 'Womp Womp', errorCode: 400);
- }
-});
-```
-
-The client recieves this json payload -
-
-```json
-{
-	"status": 400,
-	"message": "Womp Womp"
-}
-```
 
 ### Param Routing
 
@@ -144,9 +105,44 @@ router.get('/articles/**', (event) {
 });
 ```
 
-## Utilities
+### Generic handlers
 
-A set of composable utilities that help you add functionality to your server
+Specify the return type of your handlers
+
+```dart
+router.get<bool>("/25/**", (event) => true);
+router.get<int>("/42/**", (event) => 42);
+router.get<String>("/hello/**", (event) => "Hello world");
+```
+
+
+### Error Handling
+A special `CreateError` exception can be called that will terminate the request and send a 400 - Bad Request
+response
+
+```dart
+router.get('/error', (event) async {
+ try {
+  // Code that could fail.
+ }
+ catch(e) {
+   throw CreateError(message: 'Womp Womp', errorCode: 400);
+ }
+});
+```
+
+The client recieves this json payload -
+
+```json
+{
+ "status": 400,
+ "message": "Womp Womp"
+}
+```
+
+
+## Utilities
+A set of composable utilities that help you add functionality to your server.
 
 ### `readRequestBody`
 
@@ -170,6 +166,8 @@ router.post("/vamos", (event) async {
  return body;
 });
 ```
+
+There are a few more utilities that have been created which will be documented soon.
 
 ### Contributing
 
