@@ -1,3 +1,12 @@
+## 0.4.2 (Patch Release)
+
+- **EXTENDED** `readFiles` utility with new options for file handling:
+  - Added `hashFileName` parameter (boolean) to control file name generation
+  - Added `maxFileSize` parameter (int, MB) to limit upload sizes
+  - Default values: `hashFileName: false`, `maxFileSize: 10`
+- **IMPROVED** Documentation for file upload functionality in README
+- **UPDATED** Documentation comments for `readFiles` utility with comprehensive examples and return type details
+
 ## 0.4.1 (Patch Release)
 
 - **PATCHED** Improved error handling in the `readFiles` utility for better file upload management.

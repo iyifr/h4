@@ -2,18 +2,23 @@
 
 **A lightweight web framework for dart**
 
-Inspired by [unjs H3](https://h3.unjs.io), built with familiar API's and a functional style. 
+Heavily inspired by [unjs H(3)'s'](https://h3.unjs.io) API. Composable utilities, functional styles
+and simple interface.
 
-**This is a new project under active development**, there are tests, but it could break in unexpected ways.
+**This is a new project under active development**, there are tests, but it could break in
+unexpected ways.
+
+Feedback is welcome.
 
 The official documentation is a WIP - [link](https://h4-tau.vercel.app)
 
 ## Getting Started
+
 Add H4 to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  h4: ^1.0.0
+  h4: 0.4.1
 ```
 
 Or install with dart pub get
@@ -52,9 +57,9 @@ void main() {
 }
 ```
 
-
 ### Global Hooks
-You can register global hooks:
+
+Register application-wide hooks:
 
 - `onRequest`
 - `onError`
@@ -73,7 +78,6 @@ logging, error handling, etc.
  var router = createRouter();
  app.use(router);
 ```
-
 
 ### Param Routing
 
@@ -104,69 +108,171 @@ router.get('/articles/**', (event) {
 });
 ```
 
-### Generic handlers
-
-Specify the return type of your handlers
-
-```dart
-router.get<bool>("/25/**", (event) => true);
-router.get<int>("/42/**", (event) => 42);
-router.get<String>("/hello/**", (event) => "Hello world");
-```
-
-
 ### Error Handling
-A special `CreateError` exception can be called that will terminate the request and send a 400 - Bad Request
-response
+
+A special `CreateError` exception can be called that will terminate the request and send a 400 - Bad
+Request response
+
+## Advanced Examples
+
+Here's an enhanced examples section for the README.md:
+
+## Advanced Examples
+
+### Multiple Routers with Base Paths
+
+Organize your routes by creating multiple routers with different base paths:
 
 ```dart
-router.get('/error', (event) async {
- try {
-  // Code that could fail.
- }
- catch(e) {
-   throw CreateError(message: 'Womp Womp', errorCode: 400);
- }
-});
-```
+void main() {
+  var app = createApp(port: 3000);
 
-The client recieves this json payload -
+  var mainRouter = createRouter();
+  var apiRouter = createRouter();
 
-```json
-{
- "status": 400,
- "message": "Womp Womp"
+  // Mount routers with different base paths
+  app.use(mainRouter, basePath: '/');
+  app.use(apiRouter, basePath: '/api');
+
+  // Main routes
+  mainRouter.get('/hello', (event) => {'message': 'Hello World'});
+
+  // API routes
+  apiRouter.get('/users', (event) => ['user1', 'user2']);
+  apiRouter.post('/auth', (event) async {
+    var body = await readRequestBody(event);
+    return body;
+  });
 }
 ```
 
+### Request Context & Headers
 
-## Utilities
-A set of composable utilities that help you add functionality to your server.
-
-### `readRequestBody`
-
-Reads the request body as `json` or `text` depending on the `contentType` of the request body.
+Store request-specific data and handle headers:
 
 ```dart
-router.post("/vamos", (event) async {
- var body = await readRequestBody(event);
- return body;
-});
+void main() {
+  var app = createApp(
+    port: 3000,
+    onRequest: (event) {
+      // Store data in request context
+      event.context["userId"] = "123";
+
+      // Set CORS headers
+      handleCors(event, origin: "https://myapp.com", methods: "GET,POST");
+    },
+    afterResponse: (event) {
+      print("Response sent with status: ${event.statusCode}");
+    }
+  );
+}
 ```
 
-### `getHeader`
+### File Uploads
 
-Get the value of any of the incoming request headers. For convenience you can use the HTTPHeaders
-utility to get header strings.
+Handle file uploads:
 
 ```dart
-router.post("/vamos", (event) async {
- var header = getHeader(event, HttpHeaders.userAgentHeader);
- return body;
-});
+void main() {
+  var app = createApp(port: 3000);
+  var router = createRouter();
+  app.use(router);
+
+  router.post("/upload", (event) async {
+    var files = await readFiles(
+      event,
+
+      // Formdata field where your files are stored
+      fieldName: 'file',
+
+      // Optional: Set custom directory for uploaded files. (defaults to temp dir)
+      customFilePath: 'uploads',
+
+      // Optional: Hash filenames for security (defaults to false)
+      // When false, files are prefixed with a naive hash.
+      hashFileName: true,
+
+      // Optional: Set max file size in MB (defaults to 10MB)
+      maxFileSize: 5
+    );
+
+    // Returned File obj contains: path, size, originalname, mimeType
+    return {
+      'message': 'Upload complete',
+      'files': files
+    };
+  });
+}
 ```
 
-There are a few more utilities that have been created which will be documented soon.
+### Form Data Processing
+
+Handle multipart form data with ease:
+
+```dart
+void main() {
+  var app = createApp(port: 3000);
+  var router = createRouter();
+  app.use(router);
+
+  router.post("/signup", (event) async {
+    var formData = await readFormData(event);
+
+    // Access form fields
+    var username = formData.get('username');
+    var password = formData.get('password');
+
+    // Get multiple values
+    var interests = formData.getAll('interests');
+
+    return {
+      'user': username,
+      'interests': interests
+    };
+  });
+}
+```
+
+### Error Handling with Custom Responses
+
+Implement robust error handling:
+
+```dart
+void main() {
+  var app = createApp(
+    port: 3000,
+    onError: (error, stacktrace, event) {
+      print("Error occurred: $error");
+    }
+  );
+  var router = createRouter();
+  app.use(router);
+
+  router.get("/risky-operation", (event) async {
+    try {
+      // Potentially failing operation
+      throw Exception("Something went wrong");
+    } catch (e) {
+      throw CreateError(
+        message: "Operation failed: $e",
+        errorCode: 400
+      );
+    }
+  });
+}
+```
+
+The client will recieve a JSON payload -
+
+```json
+{
+	"status": 400,
+	"message": "Operation failed {error Message}"
+}
+```
+
+For more detailed implementations and utilities, check out the
+[official documentation](https://h4-tau.vercel.app).
 
 ### Contributing
 

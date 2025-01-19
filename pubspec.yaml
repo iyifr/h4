@@ -1,6 +1,6 @@
 name: h4
 description: A ligthweight, loosely opinionated http framework for dart.
-version: 0.4.1
+version: 0.4.2
 repository: https://github.com/iyifr/h4
 
 environment:

@@ -13,7 +13,7 @@ export 'package:h4/utils/req_utils.dart' hide handleMultipartFormdata;
 
 String? getRequestIp(H4Event event) {
   var ip = event.node["value"]?.headers
-      .value("x-forwarded-for")
+      .value("X-forwarded-for")
       ?.split(',')[0]
       .trim();
 
@@ -102,7 +102,8 @@ Future<FormData> handleMultipartFormdata(
     if (fieldName != null) {
       if (contentType != null || filename != null) {
         // Stream file to temporary storage
-        final fileInfo = await _streamToStorage(part, filename, null);
+        final fileInfo = await _streamToStorage(part,
+            originalFilename: filename, customFilePath: null);
 
         Map<String, dynamic> fieldData = {
           'path': fileInfo['path'],
@@ -164,14 +165,21 @@ String detectEncoding(Uint8List bytes) {
 }
 
 Future<Map<String, dynamic>> _streamToStorage(Stream<List<int>> dataStream,
-    String? originalFilename, String? customFilePath) async {
-  // Create unique filename to avoid collisions
-  final timestamp = DateTime.now().millisecondsSinceEpoch;
-  final randomId =
-      DateTime.now().microsecondsSinceEpoch.toString().substring(8);
-  final safeFilename =
-      originalFilename?.replaceAll(RegExp(r'[^a-zA-Z0-9.-]'), '_') ?? 'unnamed';
-  final filename = '$timestamp$randomId$safeFilename';
+    {String? originalFilename,
+    String? customFilePath,
+    bool hashFileName = false,
+    int maxFileSize = 10}) async {
+  String? filename = originalFilename;
+
+  if (hashFileName) {
+    final timestamp = DateTime.now().millisecondsSinceEpoch;
+    final randomId =
+        DateTime.now().microsecondsSinceEpoch.toString().substring(8);
+    final safeFilename =
+        originalFilename?.replaceAll(RegExp(r'[^a-zA-Z0-9.-]'), '_') ??
+            'unnamed';
+    filename = '$timestamp$randomId$safeFilename';
+  }
 
   // Use custom path if provided, otherwise use system temp directory
   final String filePath;
@@ -191,7 +199,7 @@ Future<Map<String, dynamic>> _streamToStorage(Stream<List<int>> dataStream,
 
   // Stream metrics
   var totalSize = 0;
-  const maxSize = 500 * 1024 * 1024; // 10MB limit, adjust as needed
+  final maxSize = maxFileSize * 1024 * 1024; // 10MB limit, adjust as needed
 
   try {
     final sink = file.openWrite();
@@ -210,7 +218,7 @@ Future<Map<String, dynamic>> _streamToStorage(Stream<List<int>> dataStream,
       'path': filePath,
       'size': totalSize,
       'originalname': originalFilename,
-      'tempFilename': filename,
+      'filename': filename,
     };
   } catch (e) {
     // Clean up on error
@@ -221,8 +229,47 @@ Future<Map<String, dynamic>> _streamToStorage(Stream<List<int>> dataStream,
   }
 }
 
+/// Reads file(s) from a multipart/form-data request for a specific field name.
+///
+/// Example usage:
+/// ```dart
+/// final files = await readFiles(event,
+///   fieldName: 'photos',
+///   hashFileName: true,
+///   maxFileSize: 5 // 5MB limit
+/// );
+/// ```
+///
+/// Parameters:
+/// - [fieldName]: The form field name containing the file(s)
+/// - [customFilePath]: Optional custom path to save uploaded files
+/// - [hashFileName]: If true, generates a unique hashed filename (default: false)
+/// - [maxFileSize]: Maximum file size in MB (default: 10MB)
+///
+/// Returns a List of file information maps containing:
+/// ```dart
+/// {
+///   'path': String,         // File path on disk
+///   'mimeType': String,     // File content type
+///   'originalname': String, // Original file name
+///   'fieldName': String,    // Form field name
+///   'size': int,           // File size in bytes
+///   'filename': String // current file name
+/// }
+/// ```
+///
+/// Returns null if no files are found for the specified fieldName.
+///
+/// Throws [CreateError] if:
+/// - Request is not multipart/form-data
+/// - Boundary is missing in content type
+/// - File size exceeds maxFileSize
+/// - File upload fails
 Future<List<Map<String, dynamic>>?> readFiles(H4Event event,
-    {required String fieldName, String? customFilePath}) async {
+    {required String fieldName,
+    String? customFilePath,
+    bool hashFileName = false,
+    int maxFileSize = 10}) async {
   final HttpRequest request = event.node["value"]!;
   final contentType = request.headers.contentType;
 
@@ -254,14 +301,18 @@ Future<List<Map<String, dynamic>>?> readFiles(H4Event event,
 
       // Only process if it matches the requested fieldName and has a filename
       if (currentFieldName == fieldName && filename != null) {
-        final fileInfo = await _streamToStorage(part, filename, customFilePath);
+        final fileInfo = await _streamToStorage(part,
+            originalFilename: filename,
+            customFilePath: customFilePath,
+            hashFileName: hashFileName,
+            maxFileSize: maxFileSize);
         files.add({
           'path': fileInfo['path'],
           'mimeType': contentType,
           'originalname': filename,
           'fieldName': fieldName,
           'size': fileInfo['size'],
-          'tempFilename': fileInfo['tempFilename'],
+          'filename': fileInfo['filename'],
         });
       }
     }

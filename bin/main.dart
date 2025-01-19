@@ -21,8 +21,8 @@ void main() async {
     return {'hello': 'world'};
   });
 
-  router.get("/vamos/:id/base/:studentId", (event) {
-    return getRouteParam(event, name: "studentId");
+  router.get("/vamos/:id/base/stong", (event) {
+    return getRouteParam(event, name: "id");
   });
 
   apiRouter.get("/signup", (event) async {
