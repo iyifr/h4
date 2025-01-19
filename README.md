@@ -108,15 +108,6 @@ router.get('/articles/**', (event) {
 });
 ```
 
-### Error Handling
-
-A special `CreateError` exception can be called that will terminate the request and send a 400 - Bad
-Request response
-
-## Advanced Examples
-
-Here's an enhanced examples section for the README.md:
-
 ## Advanced Examples
 
 ### Multiple Routers with Base Paths
@@ -207,7 +198,7 @@ void main() {
 
 ### Form Data Processing
 
-Handle multipart form data with ease:
+Handle multipart form-data:
 
 ```dart
 void main() {
