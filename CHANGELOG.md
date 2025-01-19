@@ -5,7 +5,8 @@
   - Added `maxFileSize` parameter (int, MB) to limit upload sizes
   - Default values: `hashFileName: false`, `maxFileSize: 10`
 - **IMPROVED** Documentation for file upload functionality in README
-- **UPDATED** Documentation comments for `readFiles` utility with comprehensive examples and return type details
+- **UPDATED** Documentation comments for `readFiles` utility with comprehensive examples and return
+  type details
 
 ## 0.4.1 (Patch Release)
 
@@ -13,7 +14,8 @@
 - **PATCHED** Updated documentation for the `readFormData` utility to clarify usage and examples.
 - **PATCHED** Fixed minor bugs in the router handling for better route matching.
 - **UPDATED** Dependencies in `pubspec.yaml` to ensure compatibility with the latest Dart SDK.
-- **ADDED** New test cases in `h4_test.dart` to cover edge cases for file uploads and form data handling.
+- **ADDED** New test cases in `h4_test.dart` to cover edge cases for file uploads and form data
+  handling.
 
 ## 0.4.0 (Minor release)
 
