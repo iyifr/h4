@@ -60,27 +60,32 @@ void handleCors(H4Event event, {String origin = "*", String methods = "*"}) {
 Future<FormData> readFormData(dynamic event) async {
   final HttpRequest request = event.node["value"];
   final contentType = request.headers.contentType;
+  final boundary = contentType?.parameters['boundary'];
   var formData = FormData();
 
-  if (contentType?.mimeType == null) {
+  if (contentType == null) {
+    throw CreateError(message: "Content type header not set");
+  }
+
+  if (contentType.mimeType.isEmpty) {
     logger.warning("NO formdata fields in request body");
     throw CreateError(message: "No formdata fields found");
   }
 
-  if (contentType?.mimeType == 'multipart/form-data') {
-    final boundary = contentType!.parameters['boundary'];
-    if (boundary != null) {
-      formData = await handleMultipartFormdata(request, boundary, formData);
-    } else {
-      throw Exception('Missing boundary in multipart/form-data');
-    }
-  } else if (contentType?.mimeType == 'application/x-www-form-urlencoded') {
-    await _handleUrlEncodedFormData(request, formData);
-  } else {
-    throw Exception('Unsupported content type: ${contentType?.mimeType}');
+  bool hasBoundary = boundary != null;
+
+  if (contentType.mimeType == 'multipart/form-data') {
+    return hasBoundary
+        ? await handleMultipartFormdata(request, boundary, formData)
+        : throw CreateError(message: "No boundary found");
   }
 
-  return formData;
+  if (contentType.mimeType == 'application/x-www-form-urlencoded') {
+    await _handleUrlEncodedFormData(request, formData);
+    return formData;
+  }
+
+  throw Exception('Unsupported content type: ${contentType.mimeType}');
 }
 
 Future<FormData> handleMultipartFormdata(
