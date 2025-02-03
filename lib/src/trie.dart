@@ -77,14 +77,14 @@ class Trie {
 
       if (currNode?.children[pathPiece] == null) {
         currNode?.children.forEach((key, value) {
-          if ((key.startsWith(":") || key.startsWith("*")) && value.isLeaf) {
+          if ((RegExp(r'^[:*]').hasMatch(key)) && value.isLeaf) {
             if (index == pathPieces.length - 1) {
               eventHandler = value.handlers;
             }
           }
 
           // Multiple Params
-          if (key.startsWith(":") && !value.isLeaf) {
+          if ((RegExp(r'^[:*]').hasMatch(key)) && !value.isLeaf) {
             var maps = deepTraverse(value.children);
             var result = maps["result"];
             var prev = maps["prev"];
