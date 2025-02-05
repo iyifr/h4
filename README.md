@@ -257,18 +257,20 @@ The client will recieve a JSON payload -
 
 ```json
 {
-	"status": 400,
-	"message": "Operation failed {error Message}"
+ "status": 400,
+ "message": "Operation failed {error Message}"
 }
 ```
 
-For more detailed implementations and utilities, check out the
-[official documentation](https://h4-tau.vercel.app).
-
 ### Contributing
 
-A great first PR would be improve the test coverage of this library, or adding a helpful util, for
-inspiration see [here](https://h3.unjs.io/utils).
+You can contribute by
+
+- Improving the test coverage of this library,
+
+- Adding a helpful utility, for inspiration see [here](https://h3.unjs.io/utils).
+
+- Sharing benchmarks with other libraries.
 
 ### Running tests
 
