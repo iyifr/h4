@@ -8,6 +8,24 @@ Philosophy >> Composable utilities, functional style and meaningful interface.
 
 **This is a new project under active development**.
 
+## Table of Contents
+
+- [Quick setup](#quick-setup)
+- [Examples](#examples)
+  - [Routes](#routes)
+  - [Global Hooks](#global-hooks)
+  - [Param Routing](#param-routing)
+  - [Wildcard Routing](#wildcard-routing)
+- [More Examples](#more-examples)
+  - [Multiple Routers with Base Paths](#multiple-routers-with-base-paths)
+  - [Request Context & Headers](#request-context--headers)
+  - [File Uploads](#file-uploads)
+  - [Form Data Processing](#form-data-processing)
+  - [Error Handling](#error-handling)
+- [Contributing](#contributing)
+- [Running tests](#running-tests)
+- [Code of Conduct](#code-of-conduct)
+
 ## Quick setup
 
 Add H4 to your `pubspec.yaml`:
