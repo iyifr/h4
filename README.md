@@ -1,18 +1,14 @@
 ![og](/assets/H4-banner.png)
 
-**A lightweight web framework for dart**
+**A lightweight web framework for dartlang :)**
 
-Heavily inspired by [unjs H(3)'s'](https://h3.unjs.io) API. Composable utilities, functional styles
-and simple interface.
+Inspired by [unjs H(3)'](https://h3.unjs.io) simple, composable API.
 
-**This is a new project under active development**, there are tests, but it could break in
-unexpected ways.
+Philosophy >> Composable utilities, functional style and meaningful interface.
 
-Feedback is welcome.
+**This is a new project under active development**.
 
-The official documentation is a WIP - [link](https://h4-tau.vercel.app)
-
-## Getting Started
+## Quick setup
 
 Add H4 to your `pubspec.yaml`:
 
@@ -42,9 +38,9 @@ void main() {
 }
 ```
 
-## Examples
+### Examples
 
-### Hello world
+#### Routes
 
 ```dart
 void main() {
@@ -53,33 +49,68 @@ void main() {
 
   app.use(router);
 
+  // Simply return values from your handlers and H4 handles serialization
   router.get("/", (event) => "Hello world")
+
+  router.post("/post", (event) => {'easy': 'peasy'})
 }
 ```
 
-### Global Hooks
+#### Global Hooks
 
-Register application-wide hooks:
+Register application-wide hooks (middleware pattern):
 
-- `onRequest`
-- `onError`
-- `afterResponse`
-
-These hooks are called for every request and can be used to add global logic to your app such as
-logging, error handling, etc.
+- `onRequest`: Run when a request is instantiated.
+- `onError`: Run when the application breaks due to an error.
+- `afterResponse`: Run after the request is handled.
 
 ```dart
- var app = createApp(
-   port: 5173,
-   onRequest: (event) => {},
-   onError: (error, stacktrace, event) => {},
-   afterResponse: (event) => {},
- );
- var router = createRouter();
- app.use(router);
+void main() {
+  var app = createApp(
+    port: 5173,
+    onRequest: (event) {
+      // Add request timestamp and logging
+      event.context['requestTime'] = DateTime.now();
+      print('${event.method} ${event.path}');
+    },
+    onError: (error, stacktrace, event) {
+      // Log errors to your monitoring service
+      MyLogger.captureException(error, stacktrace, {
+        'path': event.path,
+        'method': event.method,
+      });
+    },
+  );
+  var router = createRouter();
+  app.use(router);
+}
 ```
 
-### Param Routing
+Example with authentication middleware:
+
+```dart
+void main() {
+  var app = createApp(
+    port: 5173,
+    onRequest: (event) {
+      // Skip auth for public routes
+      if (event.path.startsWith('/public')) return;
+
+      final token = event.headers.value('Authorization')?.replaceAll('Bearer ', '');
+      if (token == null) {
+        throw CreateError(message: 'Unauthorized', errorCode: 401);
+      }
+
+      // Add user to context for route handlers
+      event.context['user'] = verifyToken(token);
+    },
+  );
+  var router = createRouter();
+  app.use(router);
+}
+```
+
+#### Param Routing
 
 You can define parameters in your routes using `:` prefix:
 
@@ -90,10 +121,10 @@ router.get('/users/:id', (event) {
 });
 ```
 
-### Wildcard Routing
+#### Wildcard Routing
 
 ```dart
-// Matches 'articles/page' and '/articles/otherPage' but not 'articles/page/subPage'
+// Matches 'articles/page1' and '/articles/page2' but not 'articles/page1/page2'
 router.get('/articles/*', (event) {
  final path = event.path;
  return 'The tea is teaing!!'
@@ -101,16 +132,16 @@ router.get('/articles/*', (event) {
 ```
 
 ```dart
-// Matches 'articles/foo/bar' and 'articles/page/subPage/subSubPage'
+// Matches 'articles/foo/bar' and 'articles/foo/bar/xen'
 router.get('/articles/**', (event) {
  final path = event.path;
  return 'The tea is teaing!!'
 });
 ```
 
-## Advanced Examples
+### More Examples
 
-### Multiple Routers with Base Paths
+#### Multiple Routers with Base Paths
 
 Organize your routes by creating multiple routers with different base paths:
 
@@ -137,7 +168,7 @@ void main() {
 }
 ```
 
-### Request Context & Headers
+#### Request Context & Headers
 
 Store request-specific data and handle headers:
 
@@ -159,9 +190,9 @@ void main() {
 }
 ```
 
-### File Uploads
+#### File Uploads
 
-Handle file uploads:
+Handle file uploads to your server easily:
 
 ```dart
 void main() {
@@ -196,7 +227,7 @@ void main() {
 }
 ```
 
-### Form Data Processing
+#### Form Data Processing
 
 Handle multipart form-data:
 
@@ -224,7 +255,7 @@ void main() {
 }
 ```
 
-### Error Handling with Custom Responses
+#### Error Handling
 
 Implement robust error handling:
 
@@ -257,8 +288,8 @@ The client will recieve a JSON payload -
 
 ```json
 {
- "status": 400,
- "message": "Operation failed {error Message}"
+	"status": 400,
+	"message": "Operation failed {error Message}"
 }
 ```
 
