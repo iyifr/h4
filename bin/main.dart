@@ -12,32 +12,14 @@ void main() async {
   );
 
   var router = createRouter();
-  var apiRouter = createRouter();
 
   app.use(router, basePath: '/');
-  app.use(apiRouter, basePath: '/api');
-
-  router.get('/hello', (event) {
+  
+  router.get('/', (event) {
     return {'hello': 'world'};
   });
 
-  router.get("/vamos/:id/base/stong", (event) {
-    return getRouteParam(event, name: "id");
-  });
-
-  apiRouter.get("/signup", (event) async {
-    var formData = await readFormData(event);
-
-    var username = formData.get('username');
-    var password = formData.get('password');
-
-    return 'Hi from /api with $username, $password';
-  });
-
-  apiRouter.post("/upload", (event) async {
-    var files =
-        await readFiles(event, fieldName: 'file', customFilePath: 'uploads');
-    setResponseHeader(event, header: 'Content-Type', value: 'application/json');
-    return files;
+  router.post('/', (event) {
+    return {'hello': 'twurkio'};
   });
 }

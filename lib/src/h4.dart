@@ -111,7 +111,29 @@ class H4 {
     await server?.close(force: force);
   }
 
-  /// Add a [H4Router] to the app instance for mapping requests to a different url.
+  /// Adds a `Router` to the app instance for mapping requests to a path.
+  ///
+  /// The _basePath_ parameter allows you to mount the router at a specific URL prefix.
+  /// All routes defined in the router will be relative to this base path.
+  ///
+  /// Example usage:
+  /// ```dart
+  /// void main() {
+  ///   var app = createApp(port: 3000);
+  ///
+  ///   // Create routers
+  ///   var mainRouter = createRouter();
+  ///   var apiRouter = createRouter();
+  ///
+  ///   // Mount routers with different base paths
+  ///   app.use(mainRouter, basePath: '/');      // Handles routes like '/', '/about'
+  ///   app.use(apiRouter, basePath: '/api');    // Handles routes like '/api/users'
+  ///
+  ///   // Define routes
+  ///   mainRouter.get('/hello', (event) => 'Hello World');
+  ///   apiRouter.get('/users', (event) => ['user1', 'user2']);
+  /// }
+  /// ```
   void use(H4Router router, {String basePath = '/'}) {
     routeStack[basePath] = router;
     this.router = router;
@@ -177,8 +199,8 @@ class H4 {
         return;
       }
 
-      H4Router? hRouter;
-      String routeKey = '';
+      H4Router? hRouter = routeStack['/'];
+      String routeKey = '/';
 
       for (var key in routeStack.keys) {
         if (!key.startsWith('/')) {
@@ -186,56 +208,45 @@ class H4 {
               'Invalid base path! - found $key - change the base path to /$key');
         }
 
-        if (key != '/') {
-          if (request.uri.path.startsWith(key)) {
-            hRouter = routeStack[key];
-            routeKey = key;
-          }
-        } else {
-          hRouter = routeStack['/'];
-          routeKey = '/';
+        if (request.uri.path.startsWith(key)) {
+          hRouter = routeStack[key];
+          routeKey = key;
         }
       }
 
-      var routePath = request.uri.path;
+      var incomingReqPath = request.uri.path;
 
       if (routeKey != '/') {
-        routePath = request.uri.path.replaceFirstMapped(
+        incomingReqPath = incomingReqPath.replaceFirstMapped(
             routeKey, (m) => m.toString() == routeKey ? '/' : '');
       }
 
       // Find handler for that request
-      var match = hRouter?.lookup(routePath);
+      var match = hRouter?.lookup(incomingReqPath);
 
-      var params = hRouter?.getParams(routePath);
+      var params = hRouter?.getParams(incomingReqPath);
       params ??= {};
 
       // Handling starts here.
       try {
         EventHandler? handler;
 
-        if (match != null) {
-          handler = match[request.method];
-        } else {
-          // Return 404 Not found.
+        if (match == null) {
           return404(request)(middlewares, null);
           return;
         }
+
+        handler = match[request.method];
+
+        bool otherMethodsInTheRoute = match.keys.isNotEmpty;
 
         if (handler == null) {
-          if (match.keys.isNotEmpty) {
-            // If we find no match for the request method, but other request methods are present - 405 (Not allowed).
-            return405(request)(middlewares, null, match);
-            return;
-          }
-          return404(request)(middlewares, null);
+          otherMethodsInTheRoute
+              ? return405(request)(middlewares, null, match)
+              : return404(request)(middlewares, null);
           return;
         }
-
-        // We've found a match - handle the request.
-        else {
-          defineEventHandler(handler, middlewares, params)(request);
-        }
+        defineEventHandler(handler, middlewares, params)(request);
       }
 
       // Catch `createError` exception.

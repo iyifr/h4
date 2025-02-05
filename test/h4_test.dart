@@ -89,11 +89,23 @@ void main() {
     expect(response.data, '6700');
   });
 
-  test('Handles single param routes', () async {
+  test('Handles single param in routes', () async {
     router.get('/user/:id', (event) => event.params['id']);
 
     final response = await dio.get('/user/xyz_abc_123');
     expect(response.data, 'xyz_abc_123');
+  });
+
+  test('Handles multiple params in route', () async {
+    router.get(
+        '/users/:userId/posts/:postId',
+        (event) => {
+              'userId': event.params['userId'],
+              'postId': event.params['postId']
+            });
+
+    final response = await dio.get('/users/123/posts/456');
+    expect(response.data, {'userId': '123', 'postId': '456'});
   });
 
   test('Handles match-all wildcard routes', () async {
