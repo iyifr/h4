@@ -1,3 +1,37 @@
+
+## 0.4.3 (Patch Release)
+
+- **IMPROVED** CORS handling with new `handleCors` utility:
+
+  - Added support for credentials, max age, and custom headers
+  - Better documentation and examples for CORS configuration
+  - Default values for common CORS scenarios
+
+- **ENHANCED** IP address detection in `getRequestIp`:
+
+  - Added support for additional IP headers:
+    - X-Real-IP
+    - CF-Connecting-IP
+    - True-Client-IP
+  - Improved fallback chain for IP detection
+
+- **OPTIMIZED** Router implementation:
+
+  - Improved param route scanning efficiency
+  - Better handling of root path ('/')
+  - Removed unused root handler parameter
+
+- **IMPROVED** Documentation:
+  - Added comprehensive examples for route parameters
+  - Enhanced documentation for request utilities
+  - Updated contributing guidelines
+
+- **REFACTORED** Internal utilities:
+  - Moved multipart form handling to private methods
+  - Better organization of request utilities
+  - Improved code readability and maintainability
+
+
 ## 0.4.2 (Patch Release)
 
 - **EXTENDED** `readFiles` utility with new options for file handling:
