@@ -2,9 +2,13 @@
 
 **A lightweight web framework for dartlang :)**
 
-Inspired by [unjs H(3)'](https://h3.unjs.io) simple, composable API.
+Inspired by [unjs H3'](https://h3.unjs.io)'s simple, composable API.
 
-Philosophy >> Composable utilities, functional style and meaningful interface.
+### Philosophy
+
+- Composable utilities.
+- Functional style.
+- Clean, useful abstractions.
 
 **This is a new project under active development**.
 
