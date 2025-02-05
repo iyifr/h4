@@ -9,15 +9,19 @@ import 'package:h4/utils/formdata.dart';
 import 'package:mime/mime.dart';
 import 'package:path/path.dart' as path;
 
-export 'package:h4/utils/req_utils.dart' hide handleMultipartFormdata;
+export 'package:h4/utils/req_utils.dart' hide detectEncoding;
 
 String? getRequestIp(H4Event event) {
   var ip = event.node["value"]?.headers
-      .value("X-forwarded-for")
+      .value("X-Forwarded-For")
       ?.split(',')[0]
       .trim();
 
-  ip ??= event.node["value"]!.connectionInfo?.remoteAddress.address;
+  ip ??= event.node["value"]?.headers.value("X-Real-IP")?.trim();
+  ip ??= event.node["value"]?.headers.value("CF-Connecting-IP")?.trim();
+  ip ??= event.node["value"]?.headers.value("True-Client-IP")?.trim();
+
+  ip ??= event.node["value"]?.connectionInfo?.remoteAddress.address;
 
   return ip;
 }
@@ -29,7 +33,7 @@ String? getRequestHost(H4Event event) {
   return event.node["value"]?.headers.value(HttpHeaders.hostHeader);
 }
 
-/// #### Get the full request URL.
+/// #### Get the entire incoming URL.
 ///
 /// ```dart
 /// router.get("/home", (event) => {
@@ -40,21 +44,120 @@ String? getRequestUrl(H4Event event) {
   return '${getRequestProtocol(event)}://${getRequestHost(event)}${event.path}';
 }
 
-/// #### Get the request protocol.
+/// Get the request protocol.
 getRequestProtocol(H4Event event) {
   return event.node["value"]?.headers.value("x-forwarded-proto") ?? "http";
 }
 
+/// Gets a route parameter value by name from the event.
+///
+/// ```dart
+/// // For a route defined as: '/users/:id'
+/// router.get('/users/:id', (event) {
+///   // Access the id parameter
+///   String? userId = getRouteParam(event, name: 'id');
+///
+///   if (userId != null) {
+///     return {'userId': userId};
+///   }
+///   return {'error': 'No user id provided'};
+/// });
+/// ```
+///
+/// Returns null if the parameter is not found.
+///
+/// Parameters:
+/// - event: The H4Event containing route parameters
+/// - name: The name of the route parameter to retrieve
 String? getRouteParam(H4Event event, {required String name}) {
   return event.params.containsKey(name) ? event.params[name] : null;
 }
 
-void handleCors(H4Event event, {String origin = "*", String methods = "*"}) {
-  event.node["value"]!.response.headers
-      .set(HttpHeaders.accessControlAllowOriginHeader, origin);
+/// Handles Cross-Origin Resource Sharing (CORS) headers for HTTP requests.
+///
+/// This function sets the appropriate CORS headers on the response to enable
+/// cross-origin requests. It supports configuring allowed origins, methods,
+/// headers, credentials, and cache duration.
+///
+/// Example usage:
+///
+/// ```dart
+/// // Basic usage with default settings
+/// router.get('/api', (event) {
+///   handleCors(event);
+///   return {'message': 'API response'};
+/// });
+///
+/// // Set CORS headers for every request
+/// var app = createApp(
+/// onRequest: (event) {
+///   handleCors(event,
+///     origin: 'https://myapp.com',
+///     methods: 'GET, POST',
+///     headers: 'Content-Type, Authorization',
+///     credentials: true,
+///     maxAge: 3600
+///    )
+///  }
+/// )
+///
+/// // Custom CORS configuration
+/// router.post('/api/auth', (event) {
+///   handleCors(
+///     event,
+///     origin: 'https://myapp.com',
+///     methods: 'GET, POST',
+///     headers: 'Content-Type, Authorization',
+///     credentials: true,
+///     maxAge: 3600
+///   );
+///   return {'status': 'authenticated'};
+/// });
+/// ```
+/// Parameters:
+/// - event: The H4Event containing the request and response
+/// - origin: Allowed origin(s). Defaults to "*" for all origins
+/// - methods: Comma-separated list of allowed HTTP methods
+/// - headers: Comma-separated list of allowed request headers
+/// - credentials: Whether to allow credentials (cookies, auth headers)
+/// - maxAge: How long browsers should cache the preflight response (in seconds)
+void handleCors(
+  H4Event event, {
+  String origin = "*",
+  String methods = "GET, POST, PUT, DELETE, OPTIONS, HEAD, PATCH",
+  String headers = "Content-Type, Authorization, X-Requested-With",
+  bool credentials = false,
+  int maxAge = 86400, // 24 hours
+}) {
+  final response = event.node["value"]!.response;
 
-  event.node["value"]!.response.headers
-      .set(HttpHeaders.accessControlAllowMethodsHeader, methods);
+  // Set basic CORS headers
+  response.headers.set(HttpHeaders.accessControlAllowOriginHeader, origin);
+  response.headers.set(HttpHeaders.accessControlAllowMethodsHeader, methods);
+  response.headers.set(HttpHeaders.accessControlAllowHeadersHeader, headers);
+
+  if (credentials) {
+    response.headers
+        .set(HttpHeaders.accessControlAllowCredentialsHeader, 'true');
+
+    // When credentials are allowed, origin cannot be "*"
+    if (origin == "*") {
+      // Use the requesting origin if available
+      final requestOrigin = event.node["value"]?.headers.value('Origin');
+      if (requestOrigin != null) {
+        response.headers
+            .set(HttpHeaders.accessControlAllowOriginHeader, requestOrigin);
+      }
+    }
+  }
+
+  response.headers
+      .set(HttpHeaders.accessControlMaxAgeHeader, maxAge.toString());
+
+  if (event.node["value"]?.method == 'OPTIONS') {
+    response.statusCode = HttpStatus.noContent; // 204
+    response.headers.set(HttpHeaders.contentLengthHeader, '0');
+  }
 }
 
 Future<FormData> readFormData(dynamic event) async {
@@ -76,7 +179,7 @@ Future<FormData> readFormData(dynamic event) async {
 
   if (contentType.mimeType == 'multipart/form-data') {
     return hasBoundary
-        ? await handleMultipartFormdata(request, boundary, formData)
+        ? await _handleMultipartFormdata(request, boundary, formData)
         : throw CreateError(message: "No boundary found");
   }
 
@@ -88,7 +191,7 @@ Future<FormData> readFormData(dynamic event) async {
   throw Exception('Unsupported content type: ${contentType.mimeType}');
 }
 
-Future<FormData> handleMultipartFormdata(
+Future<FormData> _handleMultipartFormdata(
     HttpRequest request, String boundary, FormData formData) async {
   final mimeTransformer = MimeMultipartTransformer(boundary);
   final parts = request.cast<List<int>>().transform(mimeTransformer);
@@ -167,71 +270,6 @@ String detectEncoding(Uint8List bytes) {
 
   // If no BOM is found, assume UTF-8
   return 'UTF-8';
-}
-
-Future<Map<String, dynamic>> _streamToStorage(Stream<List<int>> dataStream,
-    {String? originalFilename,
-    String? customFilePath,
-    bool hashFileName = false,
-    int maxFileSize = 10}) async {
-  String? filename = originalFilename;
-
-  if (hashFileName) {
-    final timestamp = DateTime.now().millisecondsSinceEpoch;
-    final randomId =
-        DateTime.now().microsecondsSinceEpoch.toString().substring(8);
-    final safeFilename =
-        originalFilename?.replaceAll(RegExp(r'[^a-zA-Z0-9.-]'), '_') ??
-            'unnamed';
-    filename = '$timestamp$randomId$safeFilename';
-  }
-
-  // Use custom path if provided, otherwise use system temp directory
-  final String filePath;
-  if (customFilePath != null) {
-    // Create directory if it doesn't exist
-    final directory = Directory(customFilePath);
-    if (!await directory.exists()) {
-      await directory.create(recursive: true);
-    }
-    filePath = path.join(customFilePath, filename);
-  } else {
-    final tempDir = Directory.systemTemp;
-    filePath = path.join(tempDir.path, filename);
-  }
-
-  final file = File(filePath);
-
-  // Stream metrics
-  var totalSize = 0;
-  final maxSize = maxFileSize * 1024 * 1024; // 10MB limit, adjust as needed
-
-  try {
-    final sink = file.openWrite();
-    await for (var chunk in dataStream) {
-      totalSize += chunk.length;
-      if (totalSize > maxSize) {
-        await sink.close();
-        await file.delete();
-        throw CreateError(message: 'File size exceeds maximum allowed size');
-      }
-      sink.add(chunk);
-    }
-    await sink.close();
-
-    return {
-      'path': filePath,
-      'size': totalSize,
-      'originalname': originalFilename,
-      'filename': filename,
-    };
-  } catch (e) {
-    // Clean up on error
-    if (await file.exists()) {
-      await file.delete();
-    }
-    throw CreateError(message: 'Failed to save file on disk: ${e.toString()}');
-  }
 }
 
 /// Reads file(s) from a multipart/form-data request for a specific field name.
@@ -325,5 +363,70 @@ Future<List<Map<String, dynamic>>?> readFiles(H4Event event,
   } catch (e) {
     throw CreateError(
         message: 'Failed to read files from formdata: ${e.toString()}');
+  }
+}
+
+Future<Map<String, dynamic>> _streamToStorage(Stream<List<int>> dataStream,
+    {String? originalFilename,
+    String? customFilePath,
+    bool hashFileName = false,
+    int maxFileSize = 10}) async {
+  String? filename = originalFilename;
+
+  if (hashFileName) {
+    final timestamp = DateTime.now().millisecondsSinceEpoch;
+    final randomId =
+        DateTime.now().microsecondsSinceEpoch.toString().substring(8);
+    final safeFilename =
+        originalFilename?.replaceAll(RegExp(r'[^a-zA-Z0-9.-]'), '_') ??
+            'unnamed';
+    filename = '$timestamp$randomId$safeFilename';
+  }
+
+  // Use custom path if provided, otherwise use system temp directory
+  final String filePath;
+  if (customFilePath != null) {
+    // Create directory if it doesn't exist
+    final directory = Directory(customFilePath);
+    if (!await directory.exists()) {
+      await directory.create(recursive: true);
+    }
+    filePath = path.join(customFilePath, filename);
+  } else {
+    final tempDir = Directory.systemTemp;
+    filePath = path.join(tempDir.path, filename);
+  }
+
+  final file = File(filePath);
+
+  // Stream metrics
+  var totalSize = 0;
+  final maxSize = maxFileSize * 1024 * 1024; // 10MB limit, adjust as needed
+
+  try {
+    final sink = file.openWrite();
+    await for (var chunk in dataStream) {
+      totalSize += chunk.length;
+      if (totalSize > maxSize) {
+        await sink.close();
+        await file.delete();
+        throw CreateError(message: 'File size exceeds maximum allowed size');
+      }
+      sink.add(chunk);
+    }
+    await sink.close();
+
+    return {
+      'path': filePath,
+      'size': totalSize,
+      'originalname': originalFilename,
+      'filename': filename,
+    };
+  } catch (e) {
+    // Clean up on error
+    if (await file.exists()) {
+      await file.delete();
+    }
+    throw CreateError(message: 'Failed to save file on disk: ${e.toString()}');
   }
 }

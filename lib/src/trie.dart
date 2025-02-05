@@ -8,10 +8,10 @@ class TrieNode {
   bool isLeaf;
   Map<String, EventHandler?> handlers;
 
-  TrieNode([EventHandler? handler, String method = "GET"])
+  TrieNode()
       : children = {},
         isLeaf = false,
-        handlers = {method: handler};
+        handlers = {};
 
   addChild(String character) {
     if (children[character] == null) {
@@ -33,12 +33,16 @@ class TrieNode {
 class Trie {
   TrieNode root;
 
-  Trie([dynamic Function(H4Event event)? rootHandler])
-      : root = TrieNode(rootHandler);
+  Trie() : root = TrieNode();
 
   insert(List<dynamic> pathPieces, dynamic Function(H4Event event) handler,
       [String method = "GET"]) {
     TrieNode currentNode = root;
+
+    if (pathPieces.isEmpty) {
+      root.handlers[method] = handler;
+      return;
+    }
 
     for (String pathPiece in pathPieces) {
       currentNode = currentNode.addChild(pathPiece);
@@ -73,12 +77,13 @@ class Trie {
     TrieNode? currNode = root;
 
     for (String pathPiece in pathPieces) {
-      int index = pathPieces.indexOf(pathPiece);
+      // No explicit route set for the incoming req url beneath the current node.
+      bool doParamRouteScan = currNode?.children[pathPiece] == null;
 
-      if (currNode?.children[pathPiece] == null) {
+      if (doParamRouteScan) {
         currNode?.children.forEach((key, value) {
           if ((RegExp(r'^[:*]').hasMatch(key)) && value.isLeaf) {
-            if (index == pathPieces.length - 1) {
+            if (pathPiece == pathPieces.last) {
               eventHandler = value.handlers;
             }
           }
@@ -159,22 +164,16 @@ class Trie {
 Map<String, String> matchPlaceholders(
     List<String> placeholder, List<String> realString) {
   Map<String, String> replacements = {};
-
-  // Iterate only up to the length of the placeholder list
   for (int i = 0; i < placeholder.length; i++) {
-    // Check if we're still within the bounds of the realString
     if (i < realString.length) {
       if (placeholder[i].startsWith(':')) {
         replacements[placeholder[i].replaceFirst(':', '')] = realString[i];
       } else if (placeholder[i] != realString[i]) {
-        // Non-placeholder elements must match exactly
         return {};
       }
     } else {
-      // realString is shorter than placeholder
       return {};
     }
   }
-
   return replacements;
 }

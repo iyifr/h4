@@ -5,7 +5,7 @@ import 'package:h4/src/trie.dart';
 class H4Router {
   Trie routes;
 
-  H4Router([EventHandler? handler]) : routes = Trie(handler);
+  H4Router([EventHandler? handler]) : routes = Trie();
 
   /// Handles **GET** requests.
   ///
@@ -22,7 +22,7 @@ class H4Router {
     routes.insert(extractPieces(path), handler, "POST");
   }
 
-  /// Handles `PUT` requests.bn 
+  /// Handles `PUT` requests.bn
   /// The event handler will only run if a PUT request is made to the specified `path`.
   put<T>(String path, EventHandler<T> handler) {
     routes.insert(extractPieces(path), handler, "PUT");
