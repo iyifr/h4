@@ -239,10 +239,13 @@ class H4 {
         handler = match[request.method];
 
         bool otherMethodsInTheRoute = match.keys.isNotEmpty;
+        bool containsALLRoute = match.containsKey("ALL");
 
         if (handler == null) {
           otherMethodsInTheRoute
-              ? return405(request)(middlewares, null, match)
+              ? containsALLRoute
+                  ? defineEventHandler(match["ALL"]!, middlewares, params)
+                  : return405(request)(middlewares, null, match)
               : return404(request)(middlewares, null);
           return;
         }
