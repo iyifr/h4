@@ -242,11 +242,16 @@ class H4 {
         bool containsALLRoute = match.containsKey("ALL");
 
         if (handler == null) {
-          otherMethodsInTheRoute
-              ? containsALLRoute
-                  ? defineEventHandler(match["ALL"]!, middlewares, params)
-                  : return405(request)(middlewares, null, match)
-              : return404(request)(middlewares, null);
+          if (!otherMethodsInTheRoute) {
+            return404(request)(middlewares, null);
+            return;
+          }
+          
+          if (containsALLRoute) {
+            defineEventHandler(match["ALL"]!, middlewares, params);
+          } else {
+            return405(request)(middlewares, null, match);
+          }
           return;
         }
         defineEventHandler(handler, middlewares, params)(request);
