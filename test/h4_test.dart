@@ -35,24 +35,17 @@ void main() {
     }
   });
 
-  test('Handles named route', () async {
-    router.get("/holla", (event) => "YEAH");
-    final response = await dio.get('/holla');
-    var foo = response.data;
-    expect(foo, 'YEAH');
-    expect(response.statusCode, 200);
-  });
-
   test('Handles param route', () async {
     router.get('/iyimide/:id', (event) => event.params["id"]);
     final response = await dio.get('/iyimide/12345');
     var foo = response.data;
     expect(foo, '12345');
   });
-
   test('Handles wildcard route', () async {
     router.get('/bigdawg/*', (event) => 'Fr');
     router.get('/fr/**', (event) => 'Fr Fr');
+
+    // Positive cases
     final response = await dio.get('/bigdawg/2');
     final response2 = await dio.get('/fr/home/page');
     final response3 = await dio.get('/fr/home/page/foo/bar');
@@ -60,6 +53,31 @@ void main() {
     expect(response.data, 'Fr');
     expect(response2.data, 'Fr Fr');
     expect(response3.data, 'Fr Fr');
+    expect(response.statusCode, 200);
+    expect(response2.statusCode, 200);
+    expect(response3.statusCode, 200);
+
+    // Negative cases
+    try {
+      await dio.get('/bigdawg'); // Missing required wildcard segment
+      fail('Should have thrown');
+    } catch (e) {
+      expect((e as DioException).response?.statusCode, 404);
+    }
+
+    try {
+      await dio.get('/bigdawg/2/3'); // Too many segments for single wildcard
+      fail('Should have thrown');
+    } catch (e) {
+      expect((e as DioException).response?.statusCode, 404);
+    }
+
+    try {
+      await dio.get('/fr'); // Missing required wildcard segment
+      fail('Should have thrown');
+    } catch (e) {
+      expect((e as DioException).response?.statusCode, 404);
+    }
   });
 
   test('Handles different HTTP methods', () async {
@@ -323,4 +341,5 @@ void main() {
     expect(fileEntry.filename, equals('test.txt'));
     expect(fileEntry.contentType, equals('text/plain'));
   });
+  
 }

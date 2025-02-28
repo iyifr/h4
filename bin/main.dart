@@ -14,8 +14,8 @@ void main() async {
   var router = createRouter();
 
   app.use(router, basePath: '/');
-  
-  router.get('/', (event) {
+
+  router.get('*', (event) {
     return {'hello': 'world'};
   });
 

@@ -21,6 +21,7 @@ bool isValidHttpPathPattern(String pattern) {
     r'|/[\p{L}\p{N}_-]+/\*'
     r'| '
     r'|\*'
+    r'|\*\*'
     r')$',
     unicode: true,
   );
