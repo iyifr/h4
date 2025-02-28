@@ -1,3 +1,18 @@
+## 0.4.4 (Patch Release)
+
+- **OPTIMIZED** Router implementation:
+  - Improved root path ('/') handling
+  - Simplified conditional logic in route handler with ternary expressions
+  - Removed support for '**' wildcard pattern
+
+- **IMPROVED** Test coverage:
+  - Added test for named routes
+  - Simplified wildcard route tests by removing redundant assertions
+  - Removed unnecessary status code checks
+
+- **REFACTORED** Internal code:
+  - Streamlined error handling logic in router
+  - Improved code readability with more concise syntax
 
 ## 0.4.3 (Patch Release)
 
