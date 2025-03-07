@@ -28,7 +28,17 @@ String? getRequestIp(H4Event event) {
 
 /// **Get incoming request host**
 ///
-/// Either **http** or **https**
+/// Extracts the host header from the incoming HTTP request.
+/// This typically returns the domain name or IP address (and optionally port)
+/// that the client used to make the request.
+///
+/// ```dart
+/// router.get("/home", (event) {
+///   String? host = getRequestHost(event); // e.g. "example.com" or "localhost:8080"
+/// });
+/// ```
+///
+/// Returns null if the host header is not present.
 String? getRequestHost(H4Event event) {
   return event.node["value"]?.headers.value(HttpHeaders.hostHeader);
 }
@@ -44,9 +54,33 @@ String? getRequestUrl(H4Event event) {
   return '${getRequestProtocol(event)}://${getRequestHost(event)}${event.path}';
 }
 
-/// Get the request protocol.
-getRequestProtocol(H4Event event) {
-  return event.node["value"]?.headers.value("x-forwarded-proto") ?? "http";
+/// **Get the request protocol**
+///
+/// Determines whether the request was made over HTTP or HTTPS.
+/// First checks the 'x-forwarded-proto' header (commonly set by proxies),
+/// then falls back to checking if the connection itself is secure.
+///
+/// ```dart
+/// router.get("/home", (event) {
+///   String protocol = getRequestProtocol(event); // "http" or "https"
+///   // Use protocol in constructing URLs or making security decisions
+/// });
+/// ```
+///
+/// Returns "https" for secure connections, "http" otherwise.
+String? getRequestProtocol(H4Event event) {
+  // Check forwarded protocol header first (set by proxies/load balancers)
+  final forwardedProto =
+      event.node["value"]?.headers.value("x-forwarded-proto");
+  if (forwardedProto != null) {
+    return forwardedProto.toLowerCase();
+  }
+
+  // Fall back to checking if the connection itself is secure
+  final isSecure = event.node["value"]?.connectionInfo?.localPort == 443 ||
+      (event.node["value"]?.headers.value('x-forwarded-ssl') == 'on') ||
+      (event.node["value"]?.headers.value('x-forwarded-scheme') == 'https');
+  return isSecure ? "https" : "http";
 }
 
 /// Gets a route parameter value by name from the event.

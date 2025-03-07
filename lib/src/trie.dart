@@ -3,6 +3,8 @@ import 'package:h4/src/event.dart';
 import 'package:h4/src/index.dart';
 import 'package:h4/src/trie_traverse.dart';
 
+export 'package:h4/src/trie.dart' hide matchPlaceholders;
+
 class TrieNode {
   Map<String, TrieNode> children;
   bool isLeaf;
@@ -35,7 +37,7 @@ class Trie {
 
   Trie() : root = TrieNode();
 
-  insert(List<dynamic> pathPieces, dynamic Function(H4Event event) handler,
+  insert(List<String> pathPieces, Function(H4Event event) handler,
       [String method = "GET"]) {
     TrieNode currentNode = root;
 
@@ -51,7 +53,7 @@ class Trie {
     currentNode.setLeaf(handler, method);
   }
 
-  search(List<dynamic> pathPieces) {
+  search(List<String> pathPieces) {
     if (pathPieces.isEmpty) {
       return root.handlers;
     }

@@ -62,3 +62,55 @@ String? getRequestHeader(H4Event event, String header) {
 HttpHeaders getRequestHeaders(H4Event event) {
   return event.node["value"]!.headers;
 }
+
+/// ### Get a specific cookie by name from the request.
+///
+/// Parameters:
+/// - `event`: An `H4Event` instance containing the HTTP request.
+/// - `name`: The name of the cookie to retrieve.
+///
+/// Returns:
+/// The cookie with the specified name, or `null` if not found.
+///
+/// Example:
+/// ```dart
+/// final authCookie = getCookie(event, 'auth_token');
+/// if (authCookie != null) {
+///   print('Auth token: ${authCookie.value}');
+/// }
+/// ```
+Cookie? getCookie(H4Event event, String name) {
+  final cookies = event.node["value"]?.cookies;
+  if (cookies == null || cookies.isEmpty) return null;
+
+  return cookies.firstWhere(
+    (cookie) => cookie.name == name,
+  );
+}
+
+/// ### Delete a cookie from the client browser
+///
+/// Parameters:
+/// - `event`: An `H4Event` instance containing the HTTP request.
+/// - `name`: The name of the cookie to delete.
+/// - `path`: Optional path of the cookie (must match the original cookie's path)
+/// - `domain`: Optional domain of the cookie (must match the original cookie's domain)
+///
+/// Example:
+/// ```dart
+/// deleteCookie(event, 'auth_token');
+/// ```
+void deleteCookie(H4Event event, String name,
+    {String path = '/', String? domain}) {
+  final response = event.node["value"]?.response;
+  if (response == null) return;
+  final cookie = Cookie(name, '');
+  cookie.expires = DateTime(1970); // Set expiration to the past
+  cookie.maxAge = 0;
+  cookie.path = path;
+  if (domain != null) {
+    cookie.domain = domain;
+  }
+
+  response.cookies.add(cookie);
+}
