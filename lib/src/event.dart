@@ -3,7 +3,16 @@ import 'dart:core';
 import 'dart:io';
 import 'package:h4/src/error_middleware.dart';
 import 'package:h4/src/h4.dart';
-import 'package:h4/src/logger.dart';
+
+final Map<String, String> _contentTypes = {
+  'html': 'text/html',
+  'json': 'application/json',
+  'text': 'text/plain',
+};
+
+void appendDefaultResponseHeader(HttpHeaders responseHeaders, headerValue) {
+  responseHeaders.add(HttpHeaders.contentTypeHeader, headerValue);
+}
 
 /// Represents an `HTTP request` event in the H4 framework.
 
@@ -12,14 +21,12 @@ class H4Event {
   Map<String, String> params;
   Map<String, dynamic> context;
   dynamic eventResponse;
+  final JsonEncoder _jsonEncoder = JsonEncoder.withIndent(' ');
 
   /// The HTTP request that triggered the event.
   ///
   /// This field is non-nullable and must be provided when creating an `H4Event` instance.
   final HttpRequest _request;
-
-  /// Tells us whether the event has been handled and a response has been generated.
-  bool _handled = false;
 
   H4Event(this._request)
       : params = {},
@@ -29,7 +36,6 @@ class H4Event {
           'query_params': _request.uri.queryParameters,
           'method': _request.method,
           'protocol': _request.protocolVersion,
-          'path_segments': _request.uri.pathSegments
         };
 
   String get path => _request.uri.path;
@@ -66,29 +72,8 @@ class H4Event {
   /// Throws an [ArgumentError] if an invalid [type] is provided.
 
   void setResponseFormat(String type) {
-    var headers = _request.response.headers;
-
-    switch (type) {
-      case 'html':
-        headers.add(HttpHeaders.contentTypeHeader, 'text/html');
-        break;
-
-      case 'text':
-        headers.add(HttpHeaders.contentTypeHeader, 'text/plain');
-        break;
-
-      case 'json':
-        headers.add(HttpHeaders.contentTypeHeader, 'application/json');
-        break;
-
-      case 'null':
-        _request.response.statusCode = 204;
-        break;
-
-      default:
-        logger.warning('Invalid response format: $type');
-        break;
-    }
+    var headerValue = _contentTypes[type];
+    appendDefaultResponseHeader(_request.response.headers, headerValue);
   }
 
   /// Sends the HTTP response based on the [handlerResult] and terminates the response stream.
@@ -98,10 +83,6 @@ class H4Event {
   void respond(dynamic handlerResult,
       {required void Function(String, String?, H4Event?)? onError,
       required Middleware? afterResponse}) {
-    if (_handled) {
-      return;
-    }
-
     // Handle Async Handler
     if (handlerResult is Future) {
       handlerResult
@@ -126,7 +107,6 @@ class H4Event {
   void _writeToClient(dynamic value) {
     _request.response.write(value);
     _shutDown();
-    _handled = true;
   }
 
   void respondWith(dynamic value) {
@@ -151,7 +131,7 @@ class H4Event {
 
     if (handlerResult is Map || handlerResult is List || handlerResult is Set) {
       event.setResponseFormat("json");
-      handlerResult = jsonEncode(handlerResult);
+      handlerResult = _jsonEncoder.convert(handlerResult);
       event._writeToClient(handlerResult);
       return;
     }

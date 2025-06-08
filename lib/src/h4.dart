@@ -238,21 +238,22 @@ class H4 {
 
         handler = match[request.method];
 
-        bool otherMethodsInTheRoute = match.keys.isNotEmpty;
+        bool otherMethodsInTheRoute = match.keys.isNotEmpty; // isEmpty // If the incoming HTTP request path has a eventHandler regisntered in the router but for another HTTP method.
         bool containsALLRoute = match.containsKey("ALL");
 
         if (handler == null) {
-          if (!otherMethodsInTheRoute) {
+          if (containsALLRoute) {
+            defineEventHandler(match["ALL"]!, middlewares, params);
+          }
+
+          if (otherMethodsInTheRoute) {
+            return405(request)(middlewares, null, match);
+            return;
+          }
+           else {
             return404(request)(middlewares, null);
             return;
           }
-          
-          if (containsALLRoute) {
-            defineEventHandler(match["ALL"]!, middlewares, params);
-          } else {
-            return405(request)(middlewares, null, match);
-          }
-          return;
         }
         defineEventHandler(handler, middlewares, params)(request);
       }
