@@ -4,14 +4,16 @@ import 'dart:io';
 import 'package:h4/src/error_middleware.dart';
 import 'package:h4/src/h4.dart';
 
-final Map<String, String> _contentTypes = {
-  'html': 'text/html',
-  'json': 'application/json',
-  'text': 'text/plain',
+final Map<String, ContentType> _contentTypes = <String, ContentType>{
+  'html': ContentType.html,
+  'json': ContentType.json,
+  'text': ContentType.text,
+  'null': ContentType.text,
 };
 
-void appendDefaultResponseHeader(HttpHeaders responseHeaders, headerValue) {
-  responseHeaders.add(HttpHeaders.contentTypeHeader, headerValue);
+void appendDefaultResponseHeader(
+    HttpHeaders responseHeaders, ContentType headerValue) {
+  responseHeaders.contentType = headerValue;
 }
 
 /// Represents an `HTTP request` event in the H4 framework.
@@ -73,7 +75,9 @@ class H4Event {
 
   void setResponseFormat(String type) {
     var headerValue = _contentTypes[type];
-    appendDefaultResponseHeader(_request.response.headers, headerValue);
+    if (headerValue != null) {
+      appendDefaultResponseHeader(_request.response.headers, headerValue);
+    }
   }
 
   /// Sends the HTTP response based on the [handlerResult] and terminates the response stream.
@@ -133,13 +137,6 @@ class H4Event {
       event.setResponseFormat("json");
       handlerResult = _jsonEncoder.convert(handlerResult);
       event._writeToClient(handlerResult);
-      return;
-    }
-
-    // Just in case the user is quirky.
-    if (handlerResult is DateTime) {
-      event.setResponseFormat('text');
-      event._writeToClient(handlerResult.toIso8601String());
       return;
     }
 
