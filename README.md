@@ -1,16 +1,12 @@
 ![og](/assets/H4-banner.png)
 
-**A lightweight web framework for dartlang :)**
+**A lightweight web framework for dart.**
 
-Inspired by [unjs H3'](https://h3.unjs.io)'s simple, composable API.
+Inspired by [unjs H3](https://h3.unjs.io).
 
-### Philosophy
+A functional, composable API for building web services.
 
-- Composable utilities.
-- Functional style.
-- Clean, useful abstractions.
-
-**This is a new project under active development**.
+**This is project is relatively new and under active development**.
 
 ## Table of Contents
 
@@ -310,8 +306,8 @@ The client will recieve a JSON payload -
 
 ```json
 {
-	"status": 400,
-	"message": "Operation failed {error Message}"
+  "status": 400,
+  "message": "Operation failed {error Message}"
 }
 ```
 

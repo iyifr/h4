@@ -1,6 +1,26 @@
+## 0.4.5
+
+- **IMPROVED** Response serialization:
+
+  - Replaced string-based content type handling with ContentType objects
+  - Added proper handling for null responses
+  - Optimized JSON serialization with JsonEncoder.withIndent
+
+- **FIXED** Route handling logic:
+
+  - Improved HTTP method handling for better performance
+  - Streamlined 404 and 405 response generation
+  - Simplified event context structure
+
+- **REFACTORED** Internal code:
+  - Removed unnecessary \_handled flag from event processing
+  - Simplified response header management
+  - Improved code organization in event.dart
+
 ## 0.4.4 (Patch Release)
 
 - **PATCHED** Router implementation:
+
   - Improved root path ('/') handling
   - Added support for '\*\*' wildcard pattern
 
@@ -292,9 +312,9 @@ apiRouter.get("/signup", (event) async  {
 
     ```json
     {
-    	"message": "Error message",
-    	"statusMessage": "Internal server error",
-    	"statusCode": 500
+      "message": "Error message",
+      "statusMessage": "Internal server error",
+      "statusCode": 500
     }
     ```
 
