@@ -32,7 +32,7 @@ Add H4 to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  h4: 0.4.1
+  h4: 0.4.5
 ```
 
 Or install with dart pub get
@@ -58,7 +58,7 @@ void main() {
 
 ### Examples
 
-#### Routes
+#### Routing
 
 ```dart
 void main() {
@@ -70,13 +70,13 @@ void main() {
   // Simply return values from your handlers and H4 handles serialization
   router.get("/", (event) => "Hello world")
 
-  router.post("/post", (event) => {'easy': 'peasy'})
+  router.post("/post=request", (event) => {'easy': 'peasy'})
 }
 ```
 
 #### Global Hooks
 
-Register application-wide hooks (middleware pattern):
+Register application-wide hooks (middleware):
 
 - `onRequest`: Run when a request is instantiated.
 - `onError`: Run when the application breaks due to an error.
@@ -156,8 +156,6 @@ router.get('/articles/**', (event) {
  return 'The tea is teaing!!'
 });
 ```
-
-### More Examples
 
 #### Multiple Routers with Base Paths
 
@@ -275,8 +273,6 @@ void main() {
 
 #### Error Handling
 
-Implement robust error handling:
-
 ```dart
 void main() {
   var app = createApp(
@@ -316,9 +312,7 @@ The client will recieve a JSON payload -
 You can contribute by
 
 - Improving the test coverage of this library,
-
 - Adding a helpful utility, for inspiration see [here](https://h3.unjs.io/utils).
-
 - Sharing benchmarks with other libraries.
 
 ### Running tests
@@ -328,7 +322,3 @@ In the root directory run
 ```bash
 dart test
 ```
-
-## Code of Conduct.
-
-Be cool and calm.
