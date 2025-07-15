@@ -9,7 +9,8 @@ import 'package:h4/utils/formdata.dart';
 import 'package:mime/mime.dart';
 import 'package:path/path.dart' as path;
 
-export 'package:h4/utils/req_utils.dart' hide detectEncoding;
+export 'package:h4/utils/req_utils.dart'
+    hide detectEncoding, handleMultipartFormdata;
 
 String? getRequestIp(H4Event event) {
   var ip = event.node["value"]?.headers
@@ -213,7 +214,7 @@ Future<FormData> readFormData(dynamic event) async {
 
   if (contentType.mimeType == 'multipart/form-data') {
     return hasBoundary
-        ? await _handleMultipartFormdata(request, boundary, formData)
+        ? await handleMultipartFormdata(request, boundary, formData)
         : throw CreateError(message: "No boundary found");
   }
 
@@ -225,7 +226,7 @@ Future<FormData> readFormData(dynamic event) async {
   throw Exception('Unsupported content type: ${contentType.mimeType}');
 }
 
-Future<FormData> _handleMultipartFormdata(
+Future<FormData> handleMultipartFormdata(
     HttpRequest request, String boundary, FormData formData) async {
   final mimeTransformer = MimeMultipartTransformer(boundary);
   final parts = request.cast<List<int>>().transform(mimeTransformer);

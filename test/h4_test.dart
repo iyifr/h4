@@ -154,18 +154,64 @@ void main() {
     }
   });
 
-  test('Reads the request body', () async {
-    router.post('/body', (event) async {
-      var body = await readRequestBody(event);
+  test('Reads different types of JSON request bodies', () async {
+    // Test Map<String, dynamic>
+    router.post('/body/map', (event) async {
+      var body = await readRequestBody<Map<String, dynamic>>(event);
       return body;
     });
 
-    final req = await dio.post('/body',
-        data: {"hi": 12},
+    final mapReq = await dio.post('/body/map',
+        data: {"name": "John", "age": 30},
         options: Options(
           headers: {'content-type': 'application/json'},
         ));
-    expect(req.data, {"hi": 12});
+    expect(mapReq.data, {"name": "John", "age": 30});
+
+    // Test Map<String, int>
+    router.post('/body/map-int', (event) async {
+      var body = await readRequestBody<Map<String, int>>(event);
+      return body;
+    });
+
+    final mapIntReq = await dio.post('/body/map-int',
+        data: {"score": 95, "rank": 1},
+        options: Options(
+          headers: {'content-type': 'application/json'},
+        ));
+    expect(mapIntReq.data, {"score": 95, "rank": 1});
+
+    // Test List<String>
+    router.post('/body/list-string', (event) async {
+      var body = await readRequestBody<List<dynamic>>(event);
+      return body;
+    });
+
+    final listStringReq = await dio.post('/body/list-string',
+        data: [30.0, 50.0, 70.0],
+        options: Options(
+          headers: {'content-type': 'application/json'},
+        ));
+    expect(listStringReq.data, [30.0, 50.0, 70.0]);
+
+    // Test List<Map<String, dynamic>>
+    router.post('/body/list-map', (event) async {
+      var body = await readRequestBody<List<Map<String, dynamic>>>(event);
+      return body;
+    });
+
+    final listMapReq = await dio.post('/body/list-map',
+        data: [
+          {"id": 1, "name": "John"},
+          {"id": 2, "name": "Jane"}
+        ],
+        options: Options(
+          headers: {'content-type': 'application/json'},
+        ));
+    expect(listMapReq.data, [
+      {"id": 1, "name": "John"},
+      {"id": 2, "name": "Jane"}
+    ]);
   });
 
   test('Correctly parses query parameters', () async {
@@ -341,5 +387,4 @@ void main() {
     expect(fileEntry.filename, equals('test.txt'));
     expect(fileEntry.contentType, equals('text/plain'));
   });
-  
 }

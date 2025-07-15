@@ -1,76 +1,143 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'package:h4/src/create_error.dart';
 import 'package:h4/src/event.dart';
-import 'package:h4/src/h4.dart';
 import 'package:h4/src/logger.dart';
+import 'package:h4/utils/formdata.dart';
+import 'package:h4/utils/req_utils.dart' as req_utils;
 
-/// Read the body of the incoming event request.
-/// Returns the request body either as parsed json or a string.
-Future<dynamic> readRequestBody(H4Event event) async {
-  var request = event.node["value"];
+/// Read the incoming HTTP event request body.
+/// Generically typed.
+///
+/// Prefer setting `T` as `List<dynamic>` or `Map<String, dynamic>` or `List<Map<String, dynamic>` and then casting the returned json body to avoid type errors.
+Future<T?> readRequestBody<T>(H4Event event) async {
+  var request = event.node["value"]!;
 
-  if (request != null) {
-    var parsedBody = await parseRequestBody(request);
-    return parsedBody;
-  }
+  var parsedBody = await parseRequestBody<T>(request);
+  return parsedBody;
 }
 
-Future<dynamic> parseRequestBody(HttpRequest request,
+FutureOr<T?> parseRequestBody<T>(HttpRequest request,
     {Duration timeout = const Duration(seconds: 360)}) async {
-  var bodyType = request.headers.contentType?.mimeType;
-
   try {
-    var bodyBytes = await request.fold<List<int>>(
-      <int>[],
-      (previousValue, element) => previousValue..addAll(element),
-    ).timeout(timeout);
+    var bodyType = request.headers.contentType?.mimeType;
+    Stream<int> byteStream = request.expand((e) => e.toList());
+
+    List<int> bodyBytes = await byteStream.toList();
+
+    if (bodyBytes.isEmpty) {
+      return null;
+    }
 
     // Return different values based on the content type of the request body
     switch (bodyType) {
       case 'application/json':
-        return parseBodyAsJson(bytes: bodyBytes);
+        return parseBodyAsJson<T>(bytes: bodyBytes);
 
       case 'text/plain':
-        return utf8.decode(bodyBytes);
+        return Future.microtask(() => utf8.decode(bodyBytes) as T).catchError(
+            (e) => throw CreateError(
+                message: 'Error reading request body', errorCode: 500));
 
+      case 'multipart/form-data':
+        var boundary = request.headers.contentType?.parameters["boundary"];
+        var formData = FormData();
+        var result = await req_utils.handleMultipartFormdata(
+            request, boundary!, formData) as T;
+        return result;
       default:
-        return utf8.decode(bodyBytes);
+        throw UnsupportedError(
+            "Unsupport request type in request body stream $bodyType");
     }
   } on TimeoutException {
     logger.severe("Timed out while trying to read the request body");
+    throw TimeoutException("Timed out while trying to read request body");
   } catch (e) {
     logger.severe(e.toString());
+    rethrow;
   }
 }
 
-// variableReturnType<T, R>(Either<T, R>? value) {
-//   return value?.fold((left) => left, (right) => right);
-// }
+T? parseBodyAsJson<T>({required List<int> bytes}) {
+  var body = utf8.decode(bytes);
+  var trimmedBody = body.trim();
 
-parseBodyAsJson({required List<int> bytes}) async {
-  var body = await parseJsonString(utf8.decode(bytes));
+  // Decode JSON
+  var decoded = json.decode(trimmedBody);
 
-  if (body?.left == null) {
-    return body?.right;
-  } else {
-    return body?.left;
+  // Handle array case
+  if (trimmedBody.startsWith('[')) {
+    if (T == List<String>) {
+      return (decoded as List).cast<String>() as T;
+    } else if (T == List<Map<String, dynamic>>) {
+      return (decoded as List).cast<Map<String, dynamic>>() as T;
+    } else if (T == List) {
+      return (decoded as List).cast<dynamic>() as T;
+    } else if (T == List<double>) {
+      return convertToList(decoded, convertToDouble) as T;
+    }
+    return decoded as T;
+  }
+
+  // Handle map/object case
+  if (trimmedBody.startsWith('{')) {
+    if (T == Map<String, dynamic>) {
+      return (decoded as Map<String, dynamic>) as T;
+    }
+    if (T == Map<String, int>) {
+      return convertToMapStringInt(decoded) as T;
+    }
+  }
+
+  throw FormatException('JSON body must be an object or array');
+}
+
+/// Type converter function signature for converting JSON values
+typedef JsonConverter<T> = T Function(dynamic json);
+
+/// Parse JSON body with custom type conversion
+T? parseBodyWithConverter<T>(List<int> bytes, JsonConverter<T> converter) {
+  var body = utf8.decode(bytes);
+
+  // Decode JSON
+  var decoded = json.decode(body);
+
+  try {
+    // Apply converter to decoded JSON
+    return converter(decoded);
+  } catch (e) {
+    throw FormatException('Failed to convert JSON to type $T: ${e.toString()}');
   }
 }
 
-FutureOr<Either<Map?, List?>?> parseJsonString(String jsonString) async {
-  if (jsonString.isEmpty) {
-    return null;
-  }
-
-  var parsed = await jsonDecode(jsonString);
-
-  if (parsed is Map) {
-    return Either.left(parsed);
-  } else if (parsed is List) {
-    return Either.right(parsed);
-  } else {
-    logger.severe('Returned JSON value is not a valid Map or List: $parsed');
-    return null;
-  }
+/// Common converter functions
+Map<String, int> convertToMapStringInt(dynamic json) {
+  if (json is! Map) throw FormatException('JSON must be an object');
+  return Map<String, int>.fromEntries(json.entries
+      .map((e) => MapEntry(e.key.toString(), int.parse(e.value.toString()))));
 }
+
+Map<String, String> convertToMapStringString(dynamic json) {
+  if (json is! Map) throw FormatException('JSON must be an object');
+  return Map<String, String>.fromEntries(
+      json.entries.map((e) => MapEntry(e.key.toString(), e.value.toString())));
+}
+
+List<T> convertToList<T>(dynamic json, T Function(dynamic) itemConverter) {
+  print(json);
+  if (json is! List) throw FormatException('JSON must be an array');
+  return json.map((item) => itemConverter(item)).toList();
+}
+
+double convertToDouble(dynamic json) {
+  if (json is num) {
+    return json.toDouble();
+  }
+  if (json is String) {
+    return double.parse(json);
+  }
+  throw FormatException('Value cannot be converted to double: $json');
+}
+
+Map<String, Type> map = {'double': double};

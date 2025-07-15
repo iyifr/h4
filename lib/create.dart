@@ -30,31 +30,6 @@ import 'package:h4/src/router.dart';
 /// ```dart
 /// // Start the application on port 8080
 /// final app = createApp(port: 8080);
-///
-/// // Start the application on the default port (3000)
-/// final app = createApp();
-///
-/// // Start the application manually
-/// final app = createApp(autoStart: false);
-/// await app.start().then((h4) => print('App started on ${h4.port}'));
-///
-/// // Using custom middleware and error handling
-/// final app = createApp(
-///   port: 8080,
-///   onRequest: (request) {
-///     print('Received request: ${request.method} ${request.url}');
-///     return request;
-///   },
-///   onError: (error, stackTrace, event) {
-///     print('Error occurred: $error');
-///     if (stackTrace != null) print('Stack trace: $stackTrace');
-///     if (event != null) print('Event: ${event.toString()}');
-///   },
-///   afterResponse: (response) {
-///     print('Sending response with status: ${response.statusCode}');
-///     return response;
-///   },
-/// );
 /// ```
 H4 createApp({
   /// The HTTP port to start the application on
