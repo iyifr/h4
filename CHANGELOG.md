@@ -1,3 +1,9 @@
+## 0.4.6
+
+- Refactored `readRequestBody` utility, making it more efficienct and less error prone.
+- Made `readRequestBody` utility generic for better typing, but didn't get very far using native types.
+- Added more tests for the `readRequestBody` utility.
+
 ## 0.4.5
 
 - **IMPROVED** Response serialization:
